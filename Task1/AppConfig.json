@@ -1,0 +1,8 @@
+{
+  "DestinationFolder": "Destination",
+  "LoggerLevel": "Debug",
+  "SourceFolders": [
+    "Test/Path/1",
+    "Test/Path/2"
+  ]
+}
