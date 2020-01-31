@@ -15,16 +15,7 @@ namespace Task1.Files.Abstractions
 
         public string ConnectionString { get; }
         public string FileName { get; }
-        public abstract void Copy(BaseStorage destination);
-        public abstract bool CanBeCopied(BaseStorage destination);
-        public void WriteToFile(string value)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public bool IsOpenToRead()
-        {
-            throw new System.NotImplementedException();
-        }
+        public abstract byte[] GetValue();
+        public abstract bool IsOpenToRead();
     }
 }

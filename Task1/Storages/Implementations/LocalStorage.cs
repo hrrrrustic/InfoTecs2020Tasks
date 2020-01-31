@@ -19,19 +19,16 @@ namespace Task1.Storages.Implementations
             return Directory.Exists(ConnectionString);
         }
 
-        public override void CreateFile(string filename)
-        {
-            throw new NotImplementedException();
-        }
-
         public override void CreateFile(BaseFile file)
         {
-            throw new NotImplementedException();
+            using FileStream stream = File.Create(Path.Combine(ConnectionString, file.FileName));
+
+            stream.Write(file.GetValue());
         }
 
         public override bool FileExist(string fileName)
         {
-            throw new NotImplementedException();
+            return File.Exists(Path.Combine(ConnectionString, fileName));
         }
 
         public override BaseStorage CreateInnerStorage(string storageName)
@@ -44,7 +41,14 @@ namespace Task1.Storages.Implementations
 
         public override IEnumerable<BaseFile> GetFiles()
         {
-            throw new NotImplementedException();
+            if (!IsAvailable())
+                throw new Exception();
+
+            return Directory.GetFiles(ConnectionString).Select(k =>
+            {
+                string newFileConnectionString = Path.Combine(ConnectionString, k);
+                return new LocalFile(newFileConnectionString, k);
+            });
         }
     }
 }

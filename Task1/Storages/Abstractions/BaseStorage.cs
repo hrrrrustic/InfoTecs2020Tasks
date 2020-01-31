@@ -12,7 +12,6 @@ namespace Task1.Storages.Abstractions
         }
 
         public abstract bool IsAvailable();
-        public abstract void CreateFile(string filename);
         public abstract void CreateFile(BaseFile file);
         public abstract bool FileExist(string fileName);
         public abstract BaseStorage CreateInnerStorage(string storageName);

@@ -1,8 +1,8 @@
-﻿namespace Task1
+﻿namespace Task1.Files.Abstractions
 {
     public interface IFile
     {
-        void WriteToFile(string value);
+        byte[] GetValue();
         bool IsOpenToRead();
     }
 }

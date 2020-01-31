@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Task1.Files.Abstractions;
 using Task1.Storages.Abstractions;
 
@@ -15,15 +16,27 @@ namespace Task1.Files.Implementations
             return File.Exists(ConnectionString);
         }
 
-        public override void Copy(BaseStorage destination)
+        public override byte[] GetValue()
         {
-            string newFilePath = Path.Combine(destination.ConnectionString, "newName");
-            File.Copy(ConnectionString, newFilePath);
+            return File.ReadAllBytes(ConnectionString);
         }
 
-        public override bool CanBeCopied(BaseStorage destination)
+        public override bool IsOpenToRead()
         {
-            return IsAvailable() && destination.IsAvailable();
+            if (!IsAvailable())
+                return false;
+
+            try
+            {
+                FileStream stream = File.Open(ConnectionString, FileMode.Open, FileAccess.Read, FileShare.Read);
+                stream.Close();
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }
