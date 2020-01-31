@@ -12,8 +12,8 @@ namespace Task1
     {
         public static void CreateBackup(IEnumerable<BaseStorage> sourceStorage, BaseStorage destinationStorage)
         {
-            if (!destinationStorage.IsAvailable())
-                throw new Exception("2");
+            if (!destinationStorage.IsAvailable()) 
+                destinationStorage.InitializeStorage();
 
             string storageName = "Backup_" + DateTime.Now.ToString("hh-mm-ss_dd/MM/yyyy");
             BaseStorage backupStorage = destinationStorage.CreateInnerStorage(storageName);

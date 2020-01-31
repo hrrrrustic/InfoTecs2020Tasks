@@ -39,6 +39,11 @@ namespace Task1.Storages.Implementations
             return new LocalStorage(newStorageConnectionString);
         }
 
+        public override void InitializeStorage()
+        {
+            Directory.CreateDirectory(ConnectionString);
+        }
+
         public override IEnumerable<BaseFile> GetFiles()
         {
             if (!IsAvailable())

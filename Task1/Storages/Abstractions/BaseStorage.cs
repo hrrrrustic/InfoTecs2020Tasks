@@ -15,6 +15,7 @@ namespace Task1.Storages.Abstractions
         public abstract void CreateFile(BaseFile file);
         public abstract bool FileExist(string fileName);
         public abstract BaseStorage CreateInnerStorage(string storageName);
+        public abstract void InitializeStorage();
         public abstract IEnumerable<BaseFile> GetFiles();
 
         public string ConnectionString { get; }

@@ -24,7 +24,7 @@ namespace Task1
                 curLevel = LoggingLevel.Debug;
 
             ILogger logger = new SimpleFileLogger(curLevel);
-
+            logger.Debug("Test");
             LocalStorage destination = new LocalStorage(config.DestinationFolder);
             List<LocalStorage> sourceFolders = config.SourceFolders.Select(k => new LocalStorage(k)).ToList();
             BackupProvider.CreateBackup(sourceFolders, destination);

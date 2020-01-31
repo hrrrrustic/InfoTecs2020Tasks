@@ -2,8 +2,8 @@
 {
     public enum LoggingLevel
     {
-        Debug = 0,
+        Error = 0,
         Info = 1,
-        Error = 2
+        Debug = 2
     }
 }

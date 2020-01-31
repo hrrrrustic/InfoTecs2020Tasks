@@ -1,27 +1,37 @@
-﻿namespace Task1
+﻿using System.IO;
+
+namespace Task1
 {
     public class SimpleFileLogger : ILogger
     {
-        public SimpleFileLogger(LoggingLevel currentMinimumLevel)
+        public SimpleFileLogger(LoggingLevel minimumLoggingLevel)
         {
-            CurrentMinimumLevel = currentMinimumLevel;
+            MinimumLoggingLevel = minimumLoggingLevel;
         }
 
-        public LoggingLevel CurrentMinimumLevel { get; }
+        public LoggingLevel MinimumLoggingLevel { get; }
 
-        public void Info()
+        public void Info(string message)
         {
-            throw new System.NotImplementedException();
+            Log(LoggingLevel.Info, message);
         }
 
-        public void Debug()
+        public void Debug(string message)
         {
-            throw new System.NotImplementedException();
+            Log(LoggingLevel.Debug, message);
         }
 
-        public void Error()
+        public void Error(string message)
         {
-            throw new System.NotImplementedException();
+            Log(LoggingLevel.Error, message);
+        }
+
+        private void Log(LoggingLevel level, string message)
+        {
+            if (level < MinimumLoggingLevel)
+                return;
+
+            File.WriteAllText("log.txt",level + " : " + message);
         }
     }
 }
