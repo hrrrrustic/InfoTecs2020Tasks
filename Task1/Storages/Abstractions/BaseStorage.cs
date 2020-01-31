@@ -4,7 +4,7 @@ using Task1.Files.Abstractions;
 
 namespace Task1.Storages.Abstractions
 {
-    public abstract class BaseStorage : IAvailableSource, IFileStorage
+    public abstract class BaseStorage : IFileStorage
     {
         protected BaseStorage(string connectionString)
         {

@@ -3,7 +3,7 @@ using Task1.Storages.Abstractions;
 
 namespace Task1.Files.Abstractions
 {
-    public abstract class BaseFile : IAvailableSource, IFile
+    public abstract class BaseFile : IFile
     {
         protected BaseFile(string connectionString, string fileName)
         {
