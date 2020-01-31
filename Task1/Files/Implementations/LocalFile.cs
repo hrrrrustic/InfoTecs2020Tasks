@@ -1,23 +1,29 @@
 ﻿using System.IO;
-using File = Task1.Files.Abstractions.File;
+using Task1.Files.Abstractions;
+using Task1.Storages.Abstractions;
 
 namespace Task1.Files.Implementations
 {
-    public class LocalFile : File
+    public class LocalFile : BaseFile
     {
-        public LocalFile(string connectionString) : base(connectionString)
+        public LocalFile(string connectionString, string filename) : base(connectionString, filename)
         {
         }
 
         public override bool IsAvailable()
         {
-            return System.IO.File.Exists(ConnectionString);
+            return File.Exists(ConnectionString);
         }
 
-        public override void Copy(string destination)
+        public override void Copy(BaseStorage destination)
         {
-            string newFilePath = Path.Combine(destination, "newName");
-            System.IO.File.Copy(ConnectionString, newFilePath);
+            string newFilePath = Path.Combine(destination.ConnectionString, "newName");
+            File.Copy(ConnectionString, newFilePath);
+        }
+
+        public override bool CanBeCopied(BaseStorage destination)
+        {
+            return IsAvailable() && destination.IsAvailable();
         }
     }
 }
