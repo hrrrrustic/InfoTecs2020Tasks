@@ -13,13 +13,18 @@ namespace Task1
     {
         static void Main(string[] args)
         {
-            Console.WriteLine();
             Run();
         }
 
         public static void Run()
         {
             AppConfig config = AppConfig.GetConfig();
+
+            if (!Enum.TryParse(config.LoggerLevel, true, out LoggingLevel curLevel))
+                curLevel = LoggingLevel.Debug;
+
+            ILogger logger = new SimpleFileLogger(curLevel);
+
             LocalStorage destination = new LocalStorage(config.DestinationFolder);
             List<LocalStorage> sourceFolders = config.SourceFolders.Select(k => new LocalStorage(k)).ToList();
             BackupProvider.CreateBackup(sourceFolders, destination);
