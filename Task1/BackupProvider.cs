@@ -13,9 +13,9 @@ namespace Task1
         public static void CreateBackup(IEnumerable<BaseStorage> sourceStorage, BaseStorage destinationStorage)
         {
             if (!destinationStorage.IsAvailable())
-                throw new Exception();
+                throw new Exception("2");
 
-            string storageName = "Backup_" + DateTime.Now.ToString("hh:mm:ss_dd/MM/yyyy");
+            string storageName = "Backup_" + DateTime.Now.ToString("hh-mm-ss_dd/MM/yyyy");
             BaseStorage backupStorage = destinationStorage.CreateInnerStorage(storageName);
 
             foreach (BaseStorage filesStorage in sourceStorage)
@@ -37,10 +37,10 @@ namespace Task1
         private static void CopyFile(BaseFile file, BaseStorage destination)
         {
             if (destination.FileExist(file.FileName))
-                throw new Exception();
+                throw new Exception("3");
 
             if (!file.IsOpenToRead())
-                throw new Exception();
+                throw new Exception("4");
 
             destination.CreateFile(file);
         }

@@ -13,12 +13,13 @@ namespace Task1
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(DateTime.Now.ToString("hh:mm:ss_dd/MM/yyyy"));
+            Console.WriteLine();
+            Run();
         }
 
         public static void Run()
         {
-            AppConfig config = AppConfig.Create();
+            AppConfig config = AppConfig.GetConfig();
             LocalStorage destination = new LocalStorage(config.DestinationFolder);
             List<LocalStorage> sourceFolders = config.SourceFolders.Select(k => new LocalStorage(k)).ToList();
             BackupProvider.CreateBackup(sourceFolders, destination);

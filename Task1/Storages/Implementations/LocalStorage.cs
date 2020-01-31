@@ -42,12 +42,12 @@ namespace Task1.Storages.Implementations
         public override IEnumerable<BaseFile> GetFiles()
         {
             if (!IsAvailable())
-                throw new Exception();
+                throw new Exception("1");
 
             return Directory.GetFiles(ConnectionString).Select(k =>
             {
-                string newFileConnectionString = Path.Combine(ConnectionString, k);
-                return new LocalFile(newFileConnectionString, k);
+                string fileName = Path.GetFileName(k);
+                return new LocalFile(k, fileName);
             });
         }
     }

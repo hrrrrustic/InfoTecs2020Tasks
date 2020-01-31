@@ -1,8 +1,8 @@
 {
-  "DestinationFolder": "Destination",
+  "DestinationFolder": "F:\\TestBackup\\destination",
   "LoggerLevel": "Debug",
   "SourceFolders": [
-    "Test/Path/1",
-    "Test/Path/2"
+    "F:\\TestBackup\\source1",
+    "F:\\TestBackup\\source2"
   ]
 }
