@@ -21,6 +21,7 @@ namespace Task1.Storages.Implementations
 
         public override void CreateFile(BaseFile file)
         {
+            //TODO: как на счет обернуть в трайкетч и с нормальной ошибкой хендлить?
             using FileStream stream = File.Create(Path.Combine(ConnectionString, file.FileName));
 
             stream.Write(file.GetValue());
@@ -34,6 +35,7 @@ namespace Task1.Storages.Implementations
         public override BaseStorage CreateInnerStorage(string storageName)
         {
             string newStorageConnectionString = Path.Combine(ConnectionString, storageName);
+            //TODO: А ты хендлишь то, что не существует этого стораджа?
             Directory.CreateDirectory(newStorageConnectionString);
             
             return new LocalStorage(newStorageConnectionString);
@@ -46,6 +48,7 @@ namespace Task1.Storages.Implementations
 
         public override IEnumerable<BaseFile> GetFiles()
         {
+            //TODO?
             if (!IsAvailable())
                 throw new Exception("1");
 

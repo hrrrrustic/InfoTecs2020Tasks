@@ -4,6 +4,7 @@ using Task1.Files.Abstractions;
 
 namespace Task1.Storages.Abstractions
 {
+    //TODO: абсолютно не понимаю зачем тебе абстрактный пустой класс
     public abstract class BaseStorage : IFileStorage
     {
         protected BaseStorage(string connectionString)

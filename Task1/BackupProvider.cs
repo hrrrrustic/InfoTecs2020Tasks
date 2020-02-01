@@ -12,6 +12,7 @@ namespace Task1
     {
         public static void CreateBackup(IEnumerable<BaseStorage> sourceStorage, BaseStorage destinationStorage)
         {
+            //TODO: а кто будет многопоточный вызов за тебя обрабатывать? Как же лок на создание?
             if (!destinationStorage.IsAvailable()) 
                 destinationStorage.InitializeStorage();
 
@@ -24,6 +25,7 @@ namespace Task1
             }
         }
 
+        //TODO: а потому это не метод BaseStorage?
         private static void CopyStorage(BaseStorage sourceStorage, BaseStorage destination)
         {
             IEnumerable<BaseFile> files = sourceStorage.GetFiles();
@@ -33,6 +35,7 @@ namespace Task1
                 CopyFile(file, destination);
             }
         }
+
 
         private static void CopyFile(BaseFile file, BaseStorage destination)
         {
