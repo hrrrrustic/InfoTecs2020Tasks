@@ -4,10 +4,6 @@ namespace Task1
 {
     public class Result<T>
     {
-        public bool Ok { get; }
-        public Exception ThrewException { get; }
-        public T Value { get; }
-
         public Result(Exception threwException, T value)
         {
             ThrewException = threwException;
@@ -28,6 +24,10 @@ namespace Task1
             Value = value;
             Ok = true;
         }
+
+        public bool Ok { get; }
+        public Exception ThrewException { get; }
+        public T Value { get; }
 
         public static implicit operator bool(Result<T> result)
         {

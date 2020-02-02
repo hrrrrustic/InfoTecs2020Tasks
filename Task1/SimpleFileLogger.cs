@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 
 namespace Task1
 {
     public class SimpleFileLogger : ILogger
     {
-        public ICollection<string> Logs { get; private set; } = new List<string>();
         public SimpleFileLogger(LoggingLevel minimumLoggingLevel)
         {
             MinimumLoggingLevel = minimumLoggingLevel;
         }
+
+        public ICollection<string> Logs { get; } = new List<string>();
 
         public LoggingLevel MinimumLoggingLevel { get; }
 

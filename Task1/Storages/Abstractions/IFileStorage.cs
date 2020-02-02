@@ -11,6 +11,5 @@ namespace Task1.Storages.Abstractions
         void InitializeStorage();
         Result<IFileStorage> CreateInnerStorage(string storageName);
         void Clone(IFileStorage destination);
-
     }
 }

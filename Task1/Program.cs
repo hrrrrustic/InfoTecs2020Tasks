@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
-using Task1.Storages.Abstractions;
 using Task1.Storages.Implementations;
 
 namespace Task1
@@ -19,7 +15,7 @@ namespace Task1
         public static void Run()
         {
             Result<AppConfig> result = AppConfig.GetConfig();
-            if(!result.Ok)
+            if (!result.Ok)
                 return;
 
             AppConfig config = result.Value;

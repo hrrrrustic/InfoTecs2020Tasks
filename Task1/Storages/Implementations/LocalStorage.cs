@@ -29,6 +29,7 @@ namespace Task1.Storages.Implementations
         }
 
         public string Path { get; }
+
         public void CreateFile(IFile file)
         {
             if (FileExist(file.Name))
@@ -41,7 +42,7 @@ namespace Task1.Storages.Implementations
             using FileStream stream = File.Create(System.IO.Path.Combine(Path, file.Name));
 
             Result<byte[]> readFileResult = file.GetValue();
-            if(!readFileResult)
+            if (!readFileResult)
                 throw new Exception();
 
             stream.Write(readFileResult.Value);
@@ -79,13 +80,10 @@ namespace Task1.Storages.Implementations
         {
             Result<IEnumerable<IFile>> filesResult = GetFiles();
 
-            if(!filesResult)
+            if (!filesResult)
                 throw new Exception();
 
-            foreach (IFile file in filesResult.Value)
-            {
-                destination.CreateFile(file);
-            }
+            foreach (IFile file in filesResult.Value) destination.CreateFile(file);
         }
 
         public void InitializeStorage()

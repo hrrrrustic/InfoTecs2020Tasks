@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
-using Microsoft.VisualBasic.CompilerServices;
 using Task1.Files.Abstractions;
-using Task1.Storages.Abstractions;
 
 namespace Task1.Files.Implementations
 {
@@ -27,7 +25,7 @@ namespace Task1.Files.Implementations
             }
         }
 
-        public string Name { get; }    
+        public string Name { get; }
 
         public string Path { get; }
 
@@ -51,7 +49,7 @@ namespace Task1.Files.Implementations
             if (!isAvailableResult)
                 return isAvailableResult;
 
-            if(!isAvailableResult.Value)
+            if (!isAvailableResult.Value)
                 return new Result<bool>(false);
 
             try
