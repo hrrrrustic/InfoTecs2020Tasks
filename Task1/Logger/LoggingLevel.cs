@@ -1,4 +1,4 @@
-﻿namespace Task1
+﻿namespace Task1.Logger
 {
     public enum LoggingLevel
     {

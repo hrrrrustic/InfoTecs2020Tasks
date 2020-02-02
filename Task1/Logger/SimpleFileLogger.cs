@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Task1
+namespace Task1.Logger
 {
     public class SimpleFileLogger : ILogger
     {

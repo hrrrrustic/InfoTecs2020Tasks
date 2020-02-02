@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Task1.Logger;
 using Task1.Storages.Abstractions;
 
 namespace Task1
