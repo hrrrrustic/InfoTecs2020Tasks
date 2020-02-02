@@ -8,14 +8,26 @@ namespace Task1
 {
     public class AppConfig
     {
-        public static AppConfig GetConfig()
+        public static Result<AppConfig> GetConfig()
         {
-            if(File.Exists("../../../AppConfig.json"))
-                return JsonConvert.DeserializeObject<AppConfig>(File.ReadAllText("../../../AppConfig.json"));
+            if (File.Exists("AppConfig.json"))
+                return DeserializeConfig();
 
-            return new AppConfig("Debug", string.Empty, new List<string>(0));
+            return new Result<AppConfig>(new FileNotFoundException());
         }
 
+        private static Result<AppConfig> DeserializeConfig()
+        {
+            try
+            {
+                AppConfig config = JsonConvert.DeserializeObject<AppConfig>(File.ReadAllText("AppConfig.json"));
+                return new Result<AppConfig>(config);
+            }
+            catch (Exception e)
+            {
+                return new Result<AppConfig>(e);
+            }
+        }
         public AppConfig(string loggerLevel, string destinationFolder, List<string> sourceFolders)
         {
             LoggerLevel = loggerLevel;

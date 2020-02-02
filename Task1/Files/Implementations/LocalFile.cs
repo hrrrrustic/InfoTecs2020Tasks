@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Microsoft.VisualBasic.CompilerServices;
 using Task1.Files.Abstractions;
 using Task1.Storages.Abstractions;
 
@@ -13,24 +14,45 @@ namespace Task1.Files.Implementations
             Name = fileName;
         }
 
-        public bool IsAvailable()
+        public Result<bool> IsAvailable()
         {
-            return File.Exists(Path);
+            try
+            {
+                bool exists = File.Exists(Path);
+                return new Result<bool>(exists);
+            }
+            catch (Exception e)
+            {
+                return new Result<bool>(e);
+            }
         }
 
         public string Name { get; }    
 
         public string Path { get; }
 
-        public byte[] GetValue()
+        public Result<byte[]> GetValue()
         {
-            return File.ReadAllBytes(Path);
+            try
+            {
+                byte[] bytes = File.ReadAllBytes(Path);
+                return new Result<byte[]>(bytes);
+            }
+            catch (Exception e)
+            {
+                return new Result<byte[]>(e);
+            }
         }
 
-        public bool CanBeOpenedToRead()
+        public Result<bool> CanBeOpenedToRead()
         {
-            if (!IsAvailable())
-                return false;
+            Result<bool> isAvailableResult = IsAvailable();
+
+            if (!isAvailableResult)
+                return isAvailableResult;
+
+            if(!isAvailableResult.Value)
+                return new Result<bool>(false);
 
             try
             {
@@ -39,10 +61,10 @@ namespace Task1.Files.Implementations
             }
             catch
             {
-                return false;
+                return new Result<bool>(false);
             }
 
-            return true;
+            return new Result<bool>(true);
         }
     }
 }

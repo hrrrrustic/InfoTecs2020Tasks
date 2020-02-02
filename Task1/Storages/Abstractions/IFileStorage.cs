@@ -6,10 +6,10 @@ namespace Task1.Storages.Abstractions
     public interface IFileStorage : ISource
     {
         void CreateFile(IFile file);
-        bool FileExist(string fileName);
-        IEnumerable<IFile> GetFiles();
+        Result<bool> FileExist(string fileName);
+        Result<IEnumerable<IFile>> GetFiles();
         void InitializeStorage();
-        IFileStorage CreateInnerStorage(string storageName);
+        Result<IFileStorage> CreateInnerStorage(string storageName);
         void Clone(IFileStorage destination);
 
     }

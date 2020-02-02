@@ -15,9 +15,17 @@ namespace Task1.Storages.Implementations
             Path = path;
         }
 
-        public bool IsAvailable()
+        public Result<bool> IsAvailable()
         {
-            return Directory.Exists(Path);
+            try
+            {
+                bool exists = Directory.Exists(Path);
+                return new Result<bool>(null, exists);
+            }
+            catch (Exception e)
+            {
+                return new Result<bool>(e);
+            }
         }
 
         public string Path { get; }
@@ -32,27 +40,49 @@ namespace Task1.Storages.Implementations
 
             using FileStream stream = File.Create(System.IO.Path.Combine(Path, file.Name));
 
-            stream.Write(file.GetValue());
+            Result<byte[]> readFileResult = file.GetValue();
+            if(!readFileResult)
+                throw new Exception();
+
+            stream.Write(readFileResult.Value);
         }
 
-        public bool FileExist(string fileName)
+        public Result<bool> FileExist(string fileName)
         {
-            return File.Exists(System.IO.Path.Combine(Path, fileName));
+            try
+            {
+                bool exists = File.Exists(System.IO.Path.Combine(Path, fileName));
+                return new Result<bool>(exists);
+            }
+            catch (Exception e)
+            {
+                return new Result<bool>(e);
+            }
         }
 
-        public IFileStorage CreateInnerStorage(string storageName)
+        public Result<IFileStorage> CreateInnerStorage(string storageName)
         {
-            string newStorageConnectionString = System.IO.Path.Combine(Path, storageName);
-            Directory.CreateDirectory(newStorageConnectionString);
-            
-            return new LocalStorage(newStorageConnectionString);
+            try
+            {
+                string newStorageConnectionString = System.IO.Path.Combine(Path, storageName);
+                Directory.CreateDirectory(newStorageConnectionString);
+
+                return new Result<IFileStorage>(new LocalStorage(newStorageConnectionString));
+            }
+            catch (Exception e)
+            {
+                return new Result<IFileStorage>(e);
+            }
         }
 
         public void Clone(IFileStorage destination)
         {
-            IEnumerable<IFile> files = GetFiles();
+            Result<IEnumerable<IFile>> filesResult = GetFiles();
 
-            foreach (IFile file in files)
+            if(!filesResult)
+                throw new Exception();
+
+            foreach (IFile file in filesResult.Value)
             {
                 destination.CreateFile(file);
             }
@@ -63,16 +93,25 @@ namespace Task1.Storages.Implementations
             Directory.CreateDirectory(Path);
         }
 
-        public IEnumerable<IFile> GetFiles()
+        public Result<IEnumerable<IFile>> GetFiles()
         {
             if (!IsAvailable())
                 throw new Exception("1");
 
-            return Directory.GetFiles(Path).Select(k =>
+            try
             {
-                string fileName = System.IO.Path.GetFileName(k);
-                return new LocalFile(k, fileName);
-            });
+                IEnumerable<LocalFile> files = Directory.GetFiles(Path).Select(k =>
+                {
+                    string fileName = System.IO.Path.GetFileName(k);
+                    return new LocalFile(k, fileName);
+                });
+
+                return new Result<IEnumerable<IFile>>(files);
+            }
+            catch (Exception e)
+            {
+                return new Result<IEnumerable<IFile>>(e);
+            }
         }
     }
 }

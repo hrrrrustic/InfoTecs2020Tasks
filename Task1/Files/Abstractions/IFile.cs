@@ -2,8 +2,8 @@
 {
     public interface IFile : ISource
     {
-        byte[] GetValue();
-        bool CanBeOpenedToRead();
+        Result<byte[]> GetValue();
+        Result<bool> CanBeOpenedToRead();
         string Name { get; }
     }
 }

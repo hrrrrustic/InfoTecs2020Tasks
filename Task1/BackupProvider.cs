@@ -18,11 +18,19 @@ namespace Task1
 
         public IEnumerable<string> CreateBackup(IEnumerable<IFileStorage> sourceStorage, IFileStorage destinationStorage)
         {
-            if (!destinationStorage.IsAvailable()) 
+            Result<bool> destinationIsAvailableResult = destinationStorage.IsAvailable();
+            if (!destinationIsAvailableResult.Ok)
+                return null;
+
+            if (!destinationIsAvailableResult.Value) 
                 destinationStorage.InitializeStorage();
 
             string storageName = "Backup_" + DateTime.Now.ToString("hh-mm-ss_dd/MM/yyyy");
-            IFileStorage backupStorage = destinationStorage.CreateInnerStorage(storageName);
+            Result<IFileStorage> createInnerStorageResult = destinationStorage.CreateInnerStorage(storageName);
+            if (!createInnerStorageResult)
+                return null;
+
+            IFileStorage backupStorage = createInnerStorageResult.Value;
 
             foreach (IFileStorage filesStorage in sourceStorage)
             {
