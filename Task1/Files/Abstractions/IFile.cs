@@ -1,8 +1,8 @@
 ﻿namespace Task1.Files.Abstractions
 {
-    public interface IFile : IAvailableSource
+    public interface IFile : ISource
     {
         byte[] GetValue();
-        bool IsOpenToRead();
+        bool CanBeOpenedToRead();
     }
 }

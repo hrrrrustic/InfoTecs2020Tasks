@@ -5,30 +5,36 @@ using Task1.Storages.Abstractions;
 
 namespace Task1.Files.Implementations
 {
-    public class LocalFile : BaseFile
+    public class LocalFile : IFile
     {
-        public LocalFile(string connectionString, string filename) : base(connectionString, filename)
+        public LocalFile(string path, string fileName)
         {
+            Path = path;
+            Name = fileName;
         }
 
-        public override bool IsAvailable()
+        public bool IsAvailable()
         {
-            return File.Exists(ConnectionString);
+            return File.Exists(Path);
         }
 
-        public override byte[] GetValue()
+        public string Name { get; }    
+
+        public string Path { get; }
+
+        public byte[] GetValue()
         {
-            return File.ReadAllBytes(ConnectionString);
+            return File.ReadAllBytes(Path);
         }
 
-        public override bool IsOpenToRead()
+        public bool CanBeOpenedToRead()
         {
             if (!IsAvailable())
                 return false;
 
             try
             {
-                FileStream stream = File.Open(ConnectionString, FileMode.Open, FileAccess.Read, FileShare.Read);
+                FileStream stream = File.Open(Path, FileMode.Open, FileAccess.Read, FileShare.Read);
                 stream.Close();
             }
             catch

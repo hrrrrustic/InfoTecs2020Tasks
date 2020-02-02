@@ -10,36 +10,36 @@ namespace Task1
 {
     public static class BackupProvider
     {
-        public static void CreateBackup(IEnumerable<BaseStorage> sourceStorage, BaseStorage destinationStorage)
+        public static void CreateBackup(IEnumerable<IFileStorage> sourceStorage, IFileStorage destinationStorage)
         {
             if (!destinationStorage.IsAvailable()) 
                 destinationStorage.InitializeStorage();
 
             string storageName = "Backup_" + DateTime.Now.ToString("hh-mm-ss_dd/MM/yyyy");
-            BaseStorage backupStorage = destinationStorage.CreateInnerStorage(storageName);
+            IFileStorage backupStorage = destinationStorage.CreateInnerStorage(storageName);
 
-            foreach (BaseStorage filesStorage in sourceStorage)
+            foreach (IFileStorage filesStorage in sourceStorage)
             {
                 CopyStorage(filesStorage, backupStorage);
             }
         }
 
-        private static void CopyStorage(BaseStorage sourceStorage, BaseStorage destination)
+        private static void CopyStorage(IFileStorage sourceStorage, IFileStorage destination)
         {
-            IEnumerable<BaseFile> files = sourceStorage.GetFiles();
+            IEnumerable<IFile> files = sourceStorage.GetFiles();
 
-            foreach (BaseFile file in files)
+            foreach (IFile file in files)
             {
                 CopyFile(file, destination);
             }
         }
 
-        private static void CopyFile(BaseFile file, BaseStorage destination)
+        private static void CopyFile(IFile file, IFileStorage destination)
         {
-            if (destination.FileExist(file.FileName))
+            if (destination.FileExist(file.Name))
                 throw new Exception("3");
 
-            if (!file.IsOpenToRead())
+            if (!file.CanBeOpenedToRead())
                 throw new Exception("4");
 
             destination.CreateFile(file);

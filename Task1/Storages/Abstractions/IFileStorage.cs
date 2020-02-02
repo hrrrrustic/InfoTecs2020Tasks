@@ -3,10 +3,12 @@ using Task1.Files.Abstractions;
 
 namespace Task1.Storages.Abstractions
 {
-    public interface IFileStorage : IAvailableSource
+    public interface IFileStorage : ISource
     {
-        void CreateFile(BaseFile file);
+        void CreateFile(IFile file);
         bool FileExist(string fileName);
-        IEnumerable<BaseFile> GetFiles();
+        IEnumerable<IFile> GetFiles();
+        void InitializeStorage();
+        IFileStorage CreateInnerStorage(string storageName);
     }
 }

@@ -8,50 +8,59 @@ using Task1.Storages.Abstractions;
 
 namespace Task1.Storages.Implementations
 {
-    public class LocalStorage : BaseStorage
+    public class LocalStorage : IFileStorage
     {
-        public LocalStorage(string connectionString) : base(connectionString)
+        public LocalStorage(string path, string name)
         {
+            Path = path;
+            Name = name;
         }
 
-        public override bool IsAvailable()
+        public bool IsAvailable()
         {
-            return Directory.Exists(ConnectionString);
+            return Directory.Exists(Path);
         }
 
-        public override void CreateFile(BaseFile file)
+        public string Path { get; }
+        public string Name { get; }
+        public bool CanBeOpenedToRead()
         {
-            using FileStream stream = File.Create(Path.Combine(ConnectionString, file.FileName));
+            throw new NotImplementedException();
+        }
+
+        public void CreateFile(IFile file)
+        {
+            using FileStream stream = File.Create(System.IO.Path.Combine(Path, file.Name));
 
             stream.Write(file.GetValue());
         }
 
-        public override bool FileExist(string fileName)
+        public bool FileExist(string fileName)
         {
-            return File.Exists(Path.Combine(ConnectionString, fileName));
+            return File.Exists(System.IO.Path.Combine(Path, fileName));
         }
 
-        public override BaseStorage CreateInnerStorage(string storageName)
+        public IFileStorage CreateInnerStorage(string storageName)
         {
-            string newStorageConnectionString = Path.Combine(ConnectionString, storageName);
+            string newStorageConnectionString = System.IO.Path.Combine(Path, storageName);
             Directory.CreateDirectory(newStorageConnectionString);
             
-            return new LocalStorage(newStorageConnectionString);
+            return new LocalStorage(newStorageConnectionString, storageName);
         }
 
-        public override void InitializeStorage()
+        public void InitializeStorage()
         {
-            Directory.CreateDirectory(ConnectionString);
+            Directory.CreateDirectory(Path);
         }
 
-        public override IEnumerable<BaseFile> GetFiles()
+        public IEnumerable<IFile> GetFiles()
         {
             if (!IsAvailable())
                 throw new Exception("1");
 
-            return Directory.GetFiles(ConnectionString).Select(k =>
+            return Directory.GetFiles(Path).Select(k =>
             {
-                string fileName = Path.GetFileName(k);
+                string fileName = System.IO.Path.GetFileName(k);
                 return new LocalFile(k, fileName);
             });
         }
