@@ -8,9 +8,15 @@ using Task1.Storages.Abstractions;
 
 namespace Task1
 {
-    public static class BackupProvider
+    public class BackupProvider
     {
-        public static void CreateBackup(IEnumerable<IFileStorage> sourceStorage, IFileStorage destinationStorage)
+        private readonly ILogger _logger;
+        public BackupProvider(ILogger logger)
+        {
+            _logger = logger;
+        }
+
+        public IEnumerable<string> CreateBackup(IEnumerable<IFileStorage> sourceStorage, IFileStorage destinationStorage)
         {
             if (!destinationStorage.IsAvailable()) 
                 destinationStorage.InitializeStorage();
@@ -20,29 +26,10 @@ namespace Task1
 
             foreach (IFileStorage filesStorage in sourceStorage)
             {
-                CopyStorage(filesStorage, backupStorage);
+                filesStorage.Clone(backupStorage);
             }
-        }
 
-        private static void CopyStorage(IFileStorage sourceStorage, IFileStorage destination)
-        {
-            IEnumerable<IFile> files = sourceStorage.GetFiles();
-
-            foreach (IFile file in files)
-            {
-                CopyFile(file, destination);
-            }
-        }
-
-        private static void CopyFile(IFile file, IFileStorage destination)
-        {
-            if (destination.FileExist(file.Name))
-                throw new Exception("3");
-
-            if (!file.CanBeOpenedToRead())
-                throw new Exception("4");
-
-            destination.CreateFile(file);
+            return _logger.Logs;
         }
     }
 }

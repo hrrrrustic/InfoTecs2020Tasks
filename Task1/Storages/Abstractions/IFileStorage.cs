@@ -10,5 +10,7 @@ namespace Task1.Storages.Abstractions
         IEnumerable<IFile> GetFiles();
         void InitializeStorage();
         IFileStorage CreateInnerStorage(string storageName);
+        void Clone(IFileStorage destination);
+
     }
 }

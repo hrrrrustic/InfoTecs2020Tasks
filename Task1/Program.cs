@@ -27,7 +27,7 @@ namespace Task1
             logger.Debug("Test");
             LocalStorage destination = new LocalStorage(config.DestinationFolder);
             List<LocalStorage> sourceFolders = config.SourceFolders.Select(k => new LocalStorage(k)).ToList();
-            BackupProvider.CreateBackup(sourceFolders, destination);
+            new BackupProvider(logger).CreateBackup(sourceFolders, destination);
         }
     }
 }

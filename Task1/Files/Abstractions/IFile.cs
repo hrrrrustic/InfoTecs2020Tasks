@@ -4,5 +4,6 @@
     {
         byte[] GetValue();
         bool CanBeOpenedToRead();
+        string Name { get; }
     }
 }

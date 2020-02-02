@@ -4,7 +4,5 @@
     {
         bool IsAvailable();
         string Path { get; }
-        string Name { get; }
-        bool CanBeOpenedToRead();
     }
 }

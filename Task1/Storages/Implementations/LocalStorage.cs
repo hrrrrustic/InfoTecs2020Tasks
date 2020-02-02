@@ -10,10 +10,9 @@ namespace Task1.Storages.Implementations
 {
     public class LocalStorage : IFileStorage
     {
-        public LocalStorage(string path, string name)
+        public LocalStorage(string path)
         {
             Path = path;
-            Name = name;
         }
 
         public bool IsAvailable()
@@ -22,14 +21,15 @@ namespace Task1.Storages.Implementations
         }
 
         public string Path { get; }
-        public string Name { get; }
-        public bool CanBeOpenedToRead()
-        {
-            throw new NotImplementedException();
-        }
-
         public void CreateFile(IFile file)
         {
+            if (FileExist(file.Name))
+                throw new Exception("3");
+
+            if (!file.CanBeOpenedToRead())
+                throw new Exception("4");
+
+
             using FileStream stream = File.Create(System.IO.Path.Combine(Path, file.Name));
 
             stream.Write(file.GetValue());
@@ -45,7 +45,17 @@ namespace Task1.Storages.Implementations
             string newStorageConnectionString = System.IO.Path.Combine(Path, storageName);
             Directory.CreateDirectory(newStorageConnectionString);
             
-            return new LocalStorage(newStorageConnectionString, storageName);
+            return new LocalStorage(newStorageConnectionString);
+        }
+
+        public void Clone(IFileStorage destination)
+        {
+            IEnumerable<IFile> files = GetFiles();
+
+            foreach (IFile file in files)
+            {
+                destination.CreateFile(file);
+            }
         }
 
         public void InitializeStorage()
