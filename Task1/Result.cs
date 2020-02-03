@@ -2,36 +2,62 @@
 
 namespace Task1
 {
-    public class Result<T>
+    public class Result
     {
-        public Result(Exception threwException, T value)
+        public Exception ThrewException { get; }
+
+        private Result(Exception threwException)
         {
             ThrewException = threwException;
-            Value = threwException == null ? default : value;
-            Ok = threwException == null;
+        }
+        private Result() : this(null)
+        {
         }
 
+        public static Result Ok()
+        {
+            return new Result();
+        }
+        public static Result OnError(Exception ex)
+        {
+            return new Result(ex);
+        }
+    }
+    public class Result<T>
+    {
         public Result(Exception threwException)
         {
             ThrewException = threwException;
             Value = default;
-            Ok = false;
         }
 
         public Result(T value)
         {
             ThrewException = null;
             Value = value;
-            Ok = true;
         }
 
-        public bool Ok { get; }
+        public bool HasValue() => ThrewException == null;
         public Exception ThrewException { get; }
-        public T Value { get; }
 
-        public static implicit operator bool(Result<T> result)
+        private T _value;
+        public T Value
         {
-            return result.Ok;
+            get => ThrewException != null ? throw ThrewException : _value;
+            private set => _value = value;
+        }
+
+        public static Result<T> WrapSafeResult(Func<T> func)
+        {
+            try
+            {
+                T result = func.Invoke();
+                return new Result<T>(result);
+            }
+            catch(Exception ex)
+            {
+                return new Result<T>(ex);
+            }
         }
     }
 }

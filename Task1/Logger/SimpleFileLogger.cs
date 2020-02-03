@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 
 namespace Task1.Logger
 {
@@ -8,8 +9,6 @@ namespace Task1.Logger
         {
             MinimumLoggingLevel = minimumLoggingLevel;
         }
-
-        public ICollection<string> Logs { get; } = new List<string>();
 
         public LoggingLevel MinimumLoggingLevel { get; }
 
@@ -31,9 +30,7 @@ namespace Task1.Logger
         private void Log(LoggingLevel level, string message)
         {
             if (level < MinimumLoggingLevel)
-                return;
-
-            Logs.Add(level + " : " + message);
+                File.AppendAllText("Log.txt",$"Loglevel : {level}. Message : {message}" + "\n");
         }
     }
 }

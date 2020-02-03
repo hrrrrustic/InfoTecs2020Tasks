@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using Task1.Files.Abstractions;
 using Task1.Files.Implementations;
+using Task1.Logger;
 using Task1.Storages.Abstractions;
 
 namespace Task1.Storages.Implementations
@@ -12,51 +14,74 @@ namespace Task1.Storages.Implementations
     {
         public LocalStorage(string path)
         {
-            Path = path;
+            SourcePath = path;
         }
 
         public Result<bool> IsAvailable()
         {
             try
             {
-                bool exists = Directory.Exists(Path);
-                return new Result<bool>(null, exists);
+                bool exists = Directory.Exists(SourcePath);
+                return new Result<bool>(exists);
             }
             catch (Exception e)
             {
+                LoggerProvider.LoggerInstance.Error("Error in checking available");
                 return new Result<bool>(e);
             }
         }
 
-        public string Path { get; }
+        public string SourcePath { get; }
 
-        public void CreateFile(IFile file)
+        public Result CreateFile(IFile file)
         {
-            if (FileExist(file.Name))
-                throw new Exception("3");
+            try
+            {
+                if (FileExist(file.Name).HasValue())
+                {
+                    LoggerProvider.LoggerInstance.Error($"Duplicate file - {file.Name}");
+                    return Result.OnError(new DuplicateNameException());
+                }
 
-            if (!file.CanBeOpenedToRead())
-                throw new Exception("4");
+                Result<bool> openFileResult = file.CanBeOpenedToRead();
 
+                if (openFileResult.HasValue() && !openFileResult.Value)
+                {
+                    LoggerProvider.LoggerInstance.Error($"Can't open file to read - {file.Name}");
+                    return Result.OnError(new MemberAccessException());
+                }
 
-            using FileStream stream = File.Create(System.IO.Path.Combine(Path, file.Name));
+                using FileStream stream = File.Create(Path.Combine(SourcePath, file.Name));
 
-            Result<byte[]> readFileResult = file.GetValue();
-            if (!readFileResult)
-                throw new Exception();
+                Result<byte[]> readFileResult = file.GetValue();
+                if (!readFileResult.HasValue())
+                {
+                    LoggerProvider.LoggerInstance.Error($"Can't read file - {file.Name}");
+                    return Result.OnError(new DataException());
+                }
 
-            stream.Write(readFileResult.Value);
+                stream.Write(readFileResult.Value);
+                LoggerProvider.LoggerInstance.Debug("File created");
+
+                return Result.Ok();
+            }
+            catch (Exception e)
+            {
+                LoggerProvider.LoggerInstance.Error("Error in creating file");
+                return Result.OnError(e);
+            }
         }
 
         public Result<bool> FileExist(string fileName)
         {
             try
             {
-                bool exists = File.Exists(System.IO.Path.Combine(Path, fileName));
+                bool exists = File.Exists(Path.Combine(SourcePath, fileName));
                 return new Result<bool>(exists);
             }
             catch (Exception e)
             {
+                LoggerProvider.LoggerInstance.Error("Error in checking file existing");
                 return new Result<bool>(e);
             }
         }
@@ -65,42 +90,72 @@ namespace Task1.Storages.Implementations
         {
             try
             {
-                string newStorageConnectionString = System.IO.Path.Combine(Path, storageName);
+                string newStorageConnectionString = Path.Combine(SourcePath, storageName);
                 Directory.CreateDirectory(newStorageConnectionString);
+
+                LoggerProvider.LoggerInstance.Info("Inner storage created");
 
                 return new Result<IFileStorage>(new LocalStorage(newStorageConnectionString));
             }
             catch (Exception e)
             {
+                LoggerProvider.LoggerInstance.Error("Error in creating inner storage");
                 return new Result<IFileStorage>(e);
             }
         }
 
-        public void Clone(IFileStorage destination)
+        public Result Clone(IFileStorage destination)
         {
-            Result<IEnumerable<IFile>> filesResult = GetFiles();
+            try
+            {
+                LoggerProvider.LoggerInstance.Debug("Get files");
+                Result<IEnumerable<IFile>> filesResult = GetFiles();
 
-            if (!filesResult)
-                throw new Exception();
+                if (!filesResult.HasValue())
+                {
+                    LoggerProvider.LoggerInstance.Error("Can't get files in storage");
+                    return Result.OnError(new MemberAccessException());
+                }
 
-            foreach (IFile file in filesResult.Value) destination.CreateFile(file);
+                LoggerProvider.LoggerInstance.Info("Copy files");
+                foreach (IFile file in filesResult.Value) destination.CreateFile(file);
+
+                return Result.Ok();
+            }
+            catch (Exception e)
+            {
+                LoggerProvider.LoggerInstance.Error("Error in coping storage");
+                return Result.OnError(e);
+            }
         }
 
-        public void InitializeStorage()
+        public Result InitializeStorage()
         {
-            Directory.CreateDirectory(Path);
+            try
+            {
+                Directory.CreateDirectory(SourcePath);
+                LoggerProvider.LoggerInstance.Info("Storage inited");
+                return Result.Ok();
+            }
+            catch (Exception e)
+            {
+                LoggerProvider.LoggerInstance.Error("Error in init storage");
+                return Result.OnError(e);
+            }
         }
 
         public Result<IEnumerable<IFile>> GetFiles()
         {
-            if (!IsAvailable())
-                throw new Exception("1");
+            if (!IsAvailable().HasValue())
+            {
+                return new Result<IEnumerable<IFile>>(new DataException());
+            }
 
             try
             {
-                IEnumerable<LocalFile> files = Directory.GetFiles(Path).Select(k =>
+                IEnumerable<LocalFile> files = Directory.GetFiles(SourcePath).Select(k =>
                 {
-                    string fileName = System.IO.Path.GetFileName(k);
+                    string fileName = Path.GetFileName(k);
                     return new LocalFile(k, fileName);
                 });
 
@@ -108,6 +163,8 @@ namespace Task1.Storages.Implementations
             }
             catch (Exception e)
             {
+                LoggerProvider.LoggerInstance.Error("Error in getting files");
+
                 return new Result<IEnumerable<IFile>>(e);
             }
         }

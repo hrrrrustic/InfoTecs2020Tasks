@@ -2,7 +2,7 @@
 {
     public interface ISource
     {
-        string Path { get; }
+        string SourcePath { get; }
         Result<bool> IsAvailable();
     }
 }

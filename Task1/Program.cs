@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Task1.Logger;
 using Task1.Storages.Implementations;
@@ -16,8 +17,11 @@ namespace Task1
         public static void Run()
         {
             Result<AppConfig> result = AppConfig.GetConfig();
-            if (!result.Ok)
+            if (!result.HasValue())
+            {
+                File.WriteAllText("Log.txt", "Config file not found \n");
                 return;
+            }
 
             AppConfig config = result.Value;
 
@@ -25,11 +29,13 @@ namespace Task1
                 curLevel = LoggingLevel.Debug;
 
             ILogger logger = new SimpleFileLogger(curLevel);
+            LoggerProvider.LoggerInstance = logger;
 
             LocalStorage destination = new LocalStorage(config.DestinationFolder);
             List<LocalStorage> sourceFolders = config.SourceFolders.Select(k => new LocalStorage(k)).ToList();
 
-            new BackupProvider(logger).CreateBackup(sourceFolders, destination);
+            LoggerProvider.LoggerInstance.Info("Starting backup");
+            new BackupProvider().CreateBackup(sourceFolders, destination);
         }
     }
 }

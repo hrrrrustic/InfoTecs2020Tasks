@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Task1.Files.Abstractions;
+using Task1.Logger;
 
 namespace Task1.Files.Implementations
 {
@@ -8,7 +9,7 @@ namespace Task1.Files.Implementations
     {
         public LocalFile(string path, string fileName)
         {
-            Path = path;
+            SourcePath = path;
             Name = fileName;
         }
 
@@ -16,28 +17,30 @@ namespace Task1.Files.Implementations
         {
             try
             {
-                bool exists = File.Exists(Path);
+                bool exists = File.Exists(SourcePath);
                 return new Result<bool>(exists);
             }
             catch (Exception e)
             {
+                LoggerProvider.LoggerInstance.Error("Error in checking available");
                 return new Result<bool>(e);
             }
         }
 
         public string Name { get; }
 
-        public string Path { get; }
+        public string SourcePath { get; }
 
         public Result<byte[]> GetValue()
         {
             try
             {
-                byte[] bytes = File.ReadAllBytes(Path);
+                byte[] bytes = File.ReadAllBytes(SourcePath);
                 return new Result<byte[]>(bytes);
             }
             catch (Exception e)
             {
+                LoggerProvider.LoggerInstance.Error("Error in reading file");
                 return new Result<byte[]>(e);
             }
         }
@@ -46,7 +49,7 @@ namespace Task1.Files.Implementations
         {
             Result<bool> isAvailableResult = IsAvailable();
 
-            if (!isAvailableResult)
+            if (!isAvailableResult.HasValue())
                 return isAvailableResult;
 
             if (!isAvailableResult.Value)
@@ -54,15 +57,15 @@ namespace Task1.Files.Implementations
 
             try
             {
-                FileStream stream = File.Open(Path, FileMode.Open, FileAccess.Read, FileShare.Read);
+                FileStream stream = File.Open(SourcePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                 stream.Close();
+                return new Result<bool>(true);
             }
             catch
             {
+                LoggerProvider.LoggerInstance.Error("Error in checking file to read");
                 return new Result<bool>(false);
             }
-
-            return new Result<bool>(true);
         }
     }
 }
