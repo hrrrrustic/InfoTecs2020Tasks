@@ -21,6 +21,7 @@ namespace Task2
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
+            services.AddSingleton<FeedService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

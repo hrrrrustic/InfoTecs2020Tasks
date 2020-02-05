@@ -1,5 +1,33 @@
 ﻿@page "/"
+@using Task2.Data
+@inject FeedService FeedService
 
-<h1>Hello, world!</h1>
+<div class="container">
+    <h1>Feeds</h1>
+    <div class="col">
+        <div class="row">
+            @foreach (Feed feed in _feeds)
+            {
+                <p>Title :</p>
+                <a href="@feed.SourceLink">@feed.Title</a>
+                <p>Description :</p>
+                <p>@feed.Description</p>
+                <p>Publication Date :</p>
+                <p>@feed.PublicationTime</p>
+                <p>============================</p>
+            }
+        </div>
+    </div>
+</div>
 
-Welcome to your new app.
+
+@code
+{
+    private List<Feed> _feeds;
+
+    protected override void OnInitialized()
+    {
+        _feeds = FeedService.GetFeeds("https://lenta.ru/rss/news");
+    }
+
+}
