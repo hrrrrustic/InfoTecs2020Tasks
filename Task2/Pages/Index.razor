@@ -1,33 +1,44 @@
 ﻿@page "/"
 @using Task2.Data
 @inject FeedService FeedService
+@inject FeedReaderSettings ReaderSettings
 
 <div class="container">
-    <h1>Feeds</h1>
-    <div class="col">
-        <div class="row">
-            @foreach (Feed feed in _feeds)
-            {
-                <p>Title :</p>
-                <a href="@feed.SourceLink">@feed.Title</a>
-                <p>Description :</p>
-                <p>@feed.Description</p>
-                <p>Publication Date :</p>
-                <p>@feed.PublicationTime</p>
-                <p>============================</p>
-            }
-        </div>
-    </div>
-</div>
-
-
-@code
-{
-    private List<Feed> _feeds;
-
-    protected override void OnInitialized()
+    @foreach (Feed feed in _feeds)
     {
-        _feeds = FeedService.GetFeeds("https://lenta.ru/rss/news");
+        <div class="row">
+            <div class="col-md-12 card">
+                <div class="card-body">
+                    <h2 class="card-title">@feed.Title</h2>
+                    <button type="button" class="btn btn-primary" @onclick="k => this.Collapse = !this.Collapse">Description @(Collapse ? "+" : "-")</button>
+                            <div class="@(Collapse ? "collapse" : "") card-body">
+                                @if (ReaderSettings.SupportFormatting)
+                                {
+                                    <p>@((MarkupString) feed.Description))</p>
+                                }
+                                else
+                                {
+                                    <p>@feed.Description</p>
+                                }
+                            </div>
+                            <p>Publication Date : @feed.PublicationTime</p>
+                            <a class="btn btn-secondary" href="@feed.SourceLink" target="_blank">View details</a>
+                            </div>
+                            </div>
+                            </div>
     }
+                            </div>
 
-}
+
+                            @code
+                            {
+                                private bool Collapse = true;
+                                private List<Feed> _feeds;
+
+                                protected override void OnInitialized()
+                                {
+                                    string source = string.IsNullOrWhiteSpace(ReaderSettings.SourceLink) ? "https://habr.com/rss/interesting" : ReaderSettings.SourceLink;
+                                    _feeds = FeedService.GetFeeds(source);
+                                }
+
+                            }

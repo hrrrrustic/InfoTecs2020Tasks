@@ -20,8 +20,8 @@ namespace Task2
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<WeatherForecastService>();
             services.AddSingleton<FeedService>();
+            services.AddSingleton<FeedReaderSettings>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -1,5 +1,9 @@
 ﻿@page "/settings"
+@using Task2.Data
+@inject FeedReaderSettings ReaderSettings
 <h3>Settings</h3>
 
+<textarea @bind-value="ReaderSettings.SourceLink" @bind-value:event="oninput" />
+<input type="checkbox" @bind-value="ReaderSettings.SupportFormatting"/>
 @code {
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace Task2.Data
 {
@@ -49,24 +50,32 @@ namespace Task2.Data
 
             foreach (XmlElement element in node)
             {
-                switch (element.Name)
-                {
-                    case "title":
-                        feed.Title = element.InnerText;
-                        break;
-                    case "link":
-                        feed.SourceLink = element.InnerText;
-                        break;
-                    case "description":
-                        feed.Description = element.InnerText;
-                        break;
-                    case "pubDate":
-                        feed.PublicationTime = DateTime.Parse(element.InnerText);
-                        break;
-                }
+                ParseFeed(element, feed);
             }
 
             return feed;
+        }
+
+        private void ParseFeed(XmlElement element, Feed feed)
+        {
+            if (!Enum.TryParse(element.Name, true, out FeedRssProperties currentProperty))
+                return;
+            
+            switch (currentProperty)
+            {
+                case FeedRssProperties.Title:
+                    feed.Title = element.InnerText;
+                    break;
+                case FeedRssProperties.Link:
+                    feed.SourceLink = element.InnerText;
+                    break;
+                case FeedRssProperties.Description:
+                    feed.Description = element.InnerText;
+                    break;
+                case FeedRssProperties.PubDate:
+                    feed.PublicationTime = DateTime.Parse(element.InnerText);
+                    break;
+            }
         }
     }
 }
