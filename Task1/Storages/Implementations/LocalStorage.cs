@@ -21,6 +21,7 @@ namespace Task1.Storages.Implementations
         {
             try
             {
+                LoggerProvider.LoggerInstance.Debug($"Checking availability {SourcePath}");
                 bool exists = Directory.Exists(SourcePath);
                 return new Result<bool>(exists);
             }
@@ -43,7 +44,13 @@ namespace Task1.Storages.Implementations
                     return Result.OnError(new DuplicateNameException());
                 }
 
-                Result<bool> openFileResult = file.CanBeOpenedToRead();
+                Result<bool> openFileResult = file.TryOpenToRead(out Stream fileStream);
+
+                if (!openFileResult.HasValue())
+                {
+                    LoggerProvider.LoggerInstance.Error("Error in opening file");
+                    return Result.OnError(openFileResult.ThrewException);
+                }
 
                 if (openFileResult.HasValue() && !openFileResult.Value)
                 {
@@ -52,15 +59,7 @@ namespace Task1.Storages.Implementations
                 }
 
                 using FileStream stream = File.Create(Path.Combine(SourcePath, file.Name));
-
-                Result<byte[]> readFileResult = file.GetValue();
-                if (!readFileResult.HasValue())
-                {
-                    LoggerProvider.LoggerInstance.Error($"Can't read file - {file.Name}");
-                    return Result.OnError(new DataException());
-                }
-
-                stream.Write(readFileResult.Value);
+                fileStream.CopyTo(stream);
                 LoggerProvider.LoggerInstance.Debug("File created");
 
                 return Result.Ok();
@@ -76,6 +75,8 @@ namespace Task1.Storages.Implementations
         {
             try
             {
+                LoggerProvider.LoggerInstance.Debug($"Checking files existing {SourcePath}");
+
                 bool exists = File.Exists(Path.Combine(SourcePath, fileName));
                 return new Result<bool>(exists);
             }
@@ -92,8 +93,6 @@ namespace Task1.Storages.Implementations
             {
                 string newStorageConnectionString = Path.Combine(SourcePath, storageName);
                 Directory.CreateDirectory(newStorageConnectionString);
-
-                LoggerProvider.LoggerInstance.Info("Inner storage created");
 
                 return new Result<IFileStorage>(new LocalStorage(newStorageConnectionString));
             }
@@ -148,6 +147,7 @@ namespace Task1.Storages.Implementations
         {
             if (!IsAvailable().HasValue())
             {
+                LoggerProvider.LoggerInstance.Error("Error in getting files");
                 return new Result<IEnumerable<IFile>>(new DataException());
             }
 
@@ -158,6 +158,8 @@ namespace Task1.Storages.Implementations
                     string fileName = Path.GetFileName(k);
                     return new LocalFile(k, fileName);
                 });
+
+                LoggerProvider.LoggerInstance.Debug("Got files");
 
                 return new Result<IEnumerable<IFile>>(files);
             }

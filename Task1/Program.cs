@@ -14,7 +14,7 @@ namespace Task1
             Run();
         }
 
-        public static void Run()
+        private static void Run()
         {
             Result<AppConfig> result = AppConfig.GetConfig();
             if (!result.HasValue())
@@ -35,7 +35,12 @@ namespace Task1
             List<LocalStorage> sourceFolders = config.SourceFolders.Select(k => new LocalStorage(k)).ToList();
 
             LoggerProvider.LoggerInstance.Info("Starting backup");
-            new BackupProvider().CreateBackup(sourceFolders, destination);
+            Result backupResult = new BackupProvider().CreateBackup(sourceFolders, destination);
+
+            if (backupResult.IsException())
+                LoggerProvider.LoggerInstance.Error($"Critical error : {backupResult.ThrewException.Message}");
+            else
+                LoggerProvider.LoggerInstance.Info("Backup created");
         }
     }
 }

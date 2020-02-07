@@ -14,6 +14,7 @@ namespace Task1
         {
         }
 
+        public bool IsException() => ThrewException != null;
         public static Result Ok()
         {
             return new Result();

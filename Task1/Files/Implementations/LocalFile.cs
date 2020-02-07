@@ -17,6 +17,8 @@ namespace Task1.Files.Implementations
         {
             try
             {
+                LoggerProvider.LoggerInstance.Debug($"Checking availability {SourcePath}");
+
                 bool exists = File.Exists(SourcePath);
                 return new Result<bool>(exists);
             }
@@ -31,39 +33,35 @@ namespace Task1.Files.Implementations
 
         public string SourcePath { get; }
 
-        public Result<byte[]> GetValue()
+        public Result<bool> TryOpenToRead(out Stream stream)
         {
-            try
-            {
-                byte[] bytes = File.ReadAllBytes(SourcePath);
-                return new Result<byte[]>(bytes);
-            }
-            catch (Exception e)
-            {
-                LoggerProvider.LoggerInstance.Error("Error in reading file");
-                return new Result<byte[]>(e);
-            }
-        }
+            LoggerProvider.LoggerInstance.Debug("Trying open file to read");
 
-        public Result<bool> CanBeOpenedToRead()
-        {
+            stream = null;
+
             Result<bool> isAvailableResult = IsAvailable();
 
             if (!isAvailableResult.HasValue())
+            {
+                LoggerProvider.LoggerInstance.Error("Error in opening file to read");
                 return isAvailableResult;
+            }
 
             if (!isAvailableResult.Value)
+            {
+                LoggerProvider.LoggerInstance.Error("Error in opening file to read");
                 return new Result<bool>(false);
+            }
 
             try
             {
-                FileStream stream = File.Open(SourcePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                stream.Close();
+                FileStream fileStream = File.Open(SourcePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                stream = fileStream;
                 return new Result<bool>(true);
             }
             catch
             {
-                LoggerProvider.LoggerInstance.Error("Error in checking file to read");
+                LoggerProvider.LoggerInstance.Error("Error in opening file to read");
                 return new Result<bool>(false);
             }
         }

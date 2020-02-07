@@ -1,9 +1,10 @@
-﻿namespace Task1.Files.Abstractions
+﻿using System.IO;
+
+namespace Task1.Files.Abstractions
 {
     public interface IFile : ISource
     {
         string Name { get; }
-        Result<byte[]> GetValue();
-        Result<bool> CanBeOpenedToRead();
+        Result<bool> TryOpenToRead(out Stream stream);
     }
 }
