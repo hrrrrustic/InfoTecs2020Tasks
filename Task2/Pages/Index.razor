@@ -37,7 +37,7 @@
 
     protected override void OnInitialized()
     {
-        string source = "https://habr.com/rss/interesting";
+        List<string> source = ReaderSettings.SourceLinks;
         _feeds = FeedService.GetFeeds(source);
     }
 

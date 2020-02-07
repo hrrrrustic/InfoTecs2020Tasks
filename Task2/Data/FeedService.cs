@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -34,6 +35,24 @@ namespace Task2.Data
             }, null, start, period);*/
         }
 
+        public List<Feed> GetFeeds(IEnumerable<string> sources)
+        {
+            return sources.Where(ValidSource).Select(GetFeeds).SelectMany(k => k).ToList();
+        }
+
+        public bool ValidSource(string source)
+        {
+            try
+            {
+                XmlDocument doc = new XmlDocument();
+                doc.Load(source);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
         public List<Feed> GetFeeds(string source)
         {
             XmlDocument doc = new XmlDocument();
