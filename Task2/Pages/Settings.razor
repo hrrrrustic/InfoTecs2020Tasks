@@ -1,9 +1,75 @@
 ﻿@page "/settings"
+@using System.Collections.ObjectModel
+@using MatBlazor
 @using Task2.Data
+@using Microsoft.AspNetCore.Components
 @inject FeedReaderSettings ReaderSettings
 <h3>Settings</h3>
 
-<textarea @bind-value="ReaderSettings.SourceLink" @bind-value:event="oninput" />
-<input type="checkbox" @bind-value="ReaderSettings.SupportFormatting"/>
-@code {
-}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <MatAccordion>
+                <MatExpansionPanel @bind-Expanded="@panelOpenState">
+                    <MatExpansionPanelSummary>
+                        <MatExpansionPanelHeader>Rss source links</MatExpansionPanelHeader>
+                    </MatExpansionPanelSummary>
+                    @foreach (string sourceLink in ReaderSettings.SourceLinks)
+                    {
+                        <MatExpansionPanelDetails>
+                            <MatButton OnClick="@(() => ClickRemove(sourceLink))" TrailingIcon="delete">@sourceLink</MatButton>
+                        </MatExpansionPanelDetails>
+                    }
+                </MatExpansionPanel>
+            </MatAccordion>
+        </div>
+        <div class="col-md-4">
+            <MatAccordion>
+                <MatExpansionPanel @bind-Expanded="@panel">
+                    <MatExpansionPanelSummary>
+                        <MatExpansionPanelHeader>Add source link</MatExpansionPanelHeader>
+                    </MatExpansionPanelSummary>
+                    <MatExpansionPanelDetails>
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <MatStringField @bind-Value="@newLink" Label="Link"></MatStringField>
+                                </div>
+                                <div class="col-md-4">
+                                    <MatButton OnClick="@ClickAdd" TrailingIcon="add"></MatButton>
+                                </div>
+                            </div>
+                        </div>
+                    </MatExpansionPanelDetails>
+                </MatExpansionPanel>
+            </MatAccordion>
+        </div>
+    </div>
+</div>
+
+
+    @code
+{
+        string newLink;
+        bool panel;
+        bool panelOpenState;
+
+        public void ClickRemove(string item)
+        {
+            ReaderSettings.SourceLinks.Remove(item);
+        }
+
+        public void ClickAdd()
+        {
+            if (string.IsNullOrWhiteSpace(newLink))
+            {
+                newLink = "Nope";
+                return; 
+            }
+
+            ReaderSettings.SourceLinks.Add(newLink);
+            newLink = string.Empty;
+        }
+
+    }
+

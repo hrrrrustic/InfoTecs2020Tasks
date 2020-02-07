@@ -1,13 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace Task2.Data
 {
+    public class UpdatedFeedsEventArgs : EventArgs
+    {
+        public UpdatedFeedsEventArgs(List<Feed> newFeeds)
+        {
+            this.newFeeds = newFeeds;
+        }
+
+        public List<Feed> newFeeds { get; }
+    }
+
     public class FeedService
     {
+        public delegate void UpdatedFeed(object sender, UpdatedFeedsEventArgs args);
+
+        public event UpdatedFeed OnUpdatedFeeds;
+
+        public FeedService()
+        {
+            /*var start = TimeSpan.Zero;
+            var period = TimeSpan.FromSeconds(15);
+
+            var timer = new Timer((k) =>
+            {
+                GetFeeds("https://habr.com/ru/rss/interesting/");
+            }, null, start, period);*/
+        }
+
         public List<Feed> GetFeeds(string source)
         {
             XmlDocument doc = new XmlDocument();
@@ -16,6 +42,7 @@ namespace Task2.Data
 
             XmlNode channelNode = GetChannelNode(rootElement);
 
+            //OnUpdatedFeeds(this, new UpdatedFeedsEventArgs(GetFeeds(channelNode)));
             return GetFeeds(channelNode);
         }
 

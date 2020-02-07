@@ -11,34 +11,34 @@
                 <div class="card-body">
                     <h2 class="card-title">@feed.Title</h2>
                     <button type="button" class="btn btn-primary" @onclick="k => this.Collapse = !this.Collapse">Description @(Collapse ? "+" : "-")</button>
-                            <div class="@(Collapse ? "collapse" : "") card-body">
-                                @if (ReaderSettings.SupportFormatting)
-                                {
-                                    <p>@((MarkupString) feed.Description))</p>
-                                }
-                                else
-                                {
-                                    <p>@feed.Description</p>
-                                }
-                            </div>
-                            <p>Publication Date : @feed.PublicationTime</p>
-                            <a class="btn btn-secondary" href="@feed.SourceLink" target="_blank">View details</a>
-                            </div>
-                            </div>
-                            </div>
+                    <div class="@(Collapse ? "collapse" : "") card-body">
+                        @if (ReaderSettings.SupportFormatting)
+                        {
+                            <p>@((MarkupString)feed.Description))</p>
+                        }
+                        else
+                        {
+                            <p>@feed.Description</p>
+                        }
+                    </div>
+                    <p>Publication Date : @feed.PublicationTime</p>
+                    <a class="btn btn-secondary" href="@feed.SourceLink" target="_blank">View details</a>
+                </div>
+            </div>
+        </div>
     }
-                            </div>
+</div>
 
 
-                            @code
+@code
                             {
-                                private bool Collapse = true;
-                                private List<Feed> _feeds;
+    private bool Collapse = true;
+    private List<Feed> _feeds;
 
-                                protected override void OnInitialized()
-                                {
-                                    string source = string.IsNullOrWhiteSpace(ReaderSettings.SourceLink) ? "https://habr.com/rss/interesting" : ReaderSettings.SourceLink;
-                                    _feeds = FeedService.GetFeeds(source);
-                                }
+    protected override void OnInitialized()
+    {
+        string source = "https://habr.com/rss/interesting";
+        _feeds = FeedService.GetFeeds(source);
+    }
 
-                            }
+}
