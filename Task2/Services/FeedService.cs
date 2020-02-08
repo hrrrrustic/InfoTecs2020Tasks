@@ -8,7 +8,6 @@ using Task2.Services.Abstractions;
 
 namespace Task2.Services
 {
-
     public class FeedService : IFeedService
     {
         public List<Feed> GetFeeds(IEnumerable<string> sources)
@@ -29,6 +28,7 @@ namespace Task2.Services
                 return false;
             }
         }
+
         public List<Feed> GetFeeds(string source)
         {
             XmlDocument doc = new XmlDocument();
@@ -55,12 +55,10 @@ namespace Task2.Services
 
         private List<Feed> GetFeeds(XmlNode node)
         {
-            List<Feed> feeds = new List<Feed>();
+            var feeds = new List<Feed>();
 
             foreach (XmlNode element in node.SelectNodes(FeedRssProperties.Item.ToLowerString()))
-            {
                 feeds.Add(GetFeed(element));
-            }
 
             return feeds;
         }

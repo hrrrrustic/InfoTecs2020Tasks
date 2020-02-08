@@ -1,5 +1,4 @@
-﻿using System;
-using Task2.Data;
+﻿using Task2.Data;
 
 namespace Task2
 {

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Task2.Data;
 using Task2.Models;
 using Task2.Services.Abstractions;

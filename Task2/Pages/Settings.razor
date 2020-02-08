@@ -1,10 +1,6 @@
 ﻿@page "/settings"
-@using System.Collections.ObjectModel
-@using MatBlazor
 @using Task2.Data
-@using Microsoft.AspNetCore.Components
 @using Task2.Models
-@using Task2.Services
 @using Task2.Services.Abstractions
 @inject IFeedService FeedService
 @inject ISettingsService SettingsService
@@ -38,7 +34,7 @@
                                                     <MatButton OnClick="@(() => ClickRemove(source.Link))" TrailingIcon="delete"></MatButton>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <MatButton OnClick="@(() => ClickActive(source.Link))" TrailingIcon="@(source.Active ? "check_box" : "check_box_outline_blank")"></MatButton>
+                                                    <MatButton OnClick="@(() => ClickActive(source.Link))" TrailingIcon="@(source.Active ? ActiveLinkCheckBoxIconName : InactiveLinkCheckBoxIconName)"></MatButton>
                                                 </div>
                                             </div>
                                         </div>
@@ -78,7 +74,7 @@
         </MatExpansionPanelSummary>
         <MatExpansionPanelDetails>
             <div>
-                <MatCheckbox @bind-Value="@FeedReaderSettings.SupportFormatting" Label="@(FeedReaderSettings.SupportFormatting ? "Formatting" : "No formatting")"></MatCheckbox>
+                <MatCheckbox @bind-Value="@FeedReaderSettings.SupportFormatting" Label="@(FeedReaderSettings.SupportFormatting ? WithFormatting : WithoutFormatting)"></MatCheckbox>
             </div>
         </MatExpansionPanelDetails>
     </MatExpansionPanel>
@@ -96,6 +92,13 @@
 
 @code
 {
+    private const string WithFormatting = "Formatting";
+    private const string WithoutFormatting = "No formatting";
+
+    private const string ActiveLinkCheckBoxIconName = "check_box";
+    private const string InactiveLinkCheckBoxIconName = "check_box_outline_blank";
+
+
     private bool _sourceSettings = false;
     private bool _approvedLinksSettings = false;
     private bool _addLinkSettings = false;
@@ -126,4 +129,3 @@
     }
 
 }
-
