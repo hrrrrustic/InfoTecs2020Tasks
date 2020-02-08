@@ -5,8 +5,9 @@
 @using Microsoft.AspNetCore.Components
 @using Task2.Models
 @using Task2.Services
-@inject FeedReaderSettings ReaderSettings
-@inject FeedService FeedService
+@using Task2.Services.Abstractions
+@inject IFeedService FeedService
+@inject ISettingsService SettingsService
 <h3>Settings</h3>
 
 <MatAccordion>
@@ -19,11 +20,11 @@
                 <div class="row">
                     <div class="col-md-8">
                         <MatAccordion>
-                            <MatExpansionPanel @bind-Expanded="@_addedLinksSettings">
+                            <MatExpansionPanel @bind-Expanded="@_approvedLinksSettings">
                                 <MatExpansionPanelSummary>
                                     <MatExpansionPanelHeader>Rss source links</MatExpansionPanelHeader>
                                 </MatExpansionPanelSummary>
-                                @foreach (RssSource source in ReaderSettings.Sources)
+                                @foreach (RssSource source in FeedReaderSettings.Sources)
                                 {
                                     <MatExpansionPanelDetails>
                                         <div class="container">
@@ -56,7 +57,7 @@
                                     <div class="container">
                                         <div class="row">
                                             <div class="col-md-8">
-                                                <MatStringField @bind-Value="@_newLink" Label="Link"></MatStringField>
+                                                <MatStringField @bind-Value="@_newLink" Label="@_newLinkLabel"></MatStringField>
                                             </div>
                                             <div class="col-md-4">
                                                 <MatButton OnClick="@ClickAdd" TrailingIcon="add"></MatButton>
@@ -77,7 +78,7 @@
         </MatExpansionPanelSummary>
         <MatExpansionPanelDetails>
             <div>
-                <MatCheckbox @bind-Value="@ReaderSettings.SupportFormatting" Label="@(GetLabel(ReaderSettings.SupportFormatting))"></MatCheckbox>
+                <MatCheckbox @bind-Value="@FeedReaderSettings.SupportFormatting" Label="@(FeedReaderSettings.SupportFormatting ? "Formatting" : "No formatting")"></MatCheckbox>
             </div>
         </MatExpansionPanelDetails>
     </MatExpansionPanel>
@@ -87,55 +88,41 @@
         </MatExpansionPanelSummary>
         <MatExpansionPanelDetails>
             <div>
-                <MatTextField @bind-Value="@ReaderSettings.RefreshTime" Label="Update time seconds"></MatTextField>
+                <MatTextField @bind-Value="@FeedReaderSettings.RefreshTime" Label="Update time seconds"></MatTextField>
             </div>
         </MatExpansionPanelDetails>
     </MatExpansionPanel>
 </MatAccordion>
 
-
-
-
 @code
 {
     private bool _sourceSettings = false;
-    private bool _addedLinksSettings = false;
+    private bool _approvedLinksSettings = false;
     private bool _addLinkSettings = false;
     private string _newLink;
+    private string _newLinkLabel = "Link";
 
-    string GetLabel(bool val)
+    private void ClickRemove(string item)
     {
-        return !val ? "No formatting" : "Formatting";
+        SettingsService.RemoveSource(item);
     }
 
-    public void ClickRemove(string item)
+    private void ClickActive(string item)
     {
-        ReaderSettings.Sources.Remove(ReaderSettings.Sources.Single(k => k.Link == item));
+        SettingsService.ChangeSourceActivity(item);
     }
 
-    public void ClickActive(string item)
+    private void ClickAdd()
     {
-        int ind = ReaderSettings.Sources.FindIndex(k => k.Link == item);
-        ReaderSettings.Sources[ind] = new RssSource(ReaderSettings.Sources[ind].Link, !ReaderSettings.Sources[ind].Active);
-    }
-    public void ClickAdd()
-    {
-        if (string.IsNullOrWhiteSpace(_newLink))
+        RssSource addedSource = SettingsService.AddNewLink(_newLink);
+
+        if (addedSource == null)
         {
-            _newLink = "Nope";
+            _newLinkLabel = "Invalid link";
             return;
         }
 
-        bool valid = FeedService.ValidSource(_newLink);
-
-        if (!valid)
-        {
-            _newLink = "Invalid link";
-            return;
-        }
-
-        ReaderSettings.Sources.Add(new RssSource(_newLink, true));
-        _newLink = string.Empty;
+        _newLinkLabel = "Ok";
     }
 
 }

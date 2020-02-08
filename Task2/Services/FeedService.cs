@@ -4,11 +4,12 @@ using System.Linq;
 using System.Xml;
 using Task2.Data;
 using Task2.Models;
+using Task2.Services.Abstractions;
 
 namespace Task2.Services
 {
 
-    public class FeedService
+    public class FeedService : IFeedService
     {
         public List<Feed> GetFeeds(IEnumerable<string> sources)
         {

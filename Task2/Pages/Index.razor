@@ -2,8 +2,8 @@
 @using Task2.Data
 @using Task2.Models
 @using Task2.Services
-@inject FeedService FeedService
-@inject FeedReaderSettings ReaderSettings
+@using Task2.Services.Abstractions
+@inject IFeedService FeedService
 
 <div class="container">
     @foreach (Feed feed in _feeds)
@@ -14,7 +14,7 @@
                     <h2 class="card-title">@feed.Title</h2>
                     <button type="button" class="btn btn-primary" @onclick="@(k => this._collapseFeed[feed.FeedId] = !this._collapseFeed[feed.FeedId])">Description @(_collapseFeed[feed.FeedId] ? "+" : "-")</button>
                     <div class="@(_collapseFeed[feed.FeedId] ? "collapse" : "") card-body">
-                        @if (ReaderSettings.SupportFormatting)
+                        @if (FeedReaderSettings.SupportFormatting)
                         {
                             <p>@((MarkupString)feed.Description))</p>
                         }
@@ -33,13 +33,13 @@
 
 
 @code
-                            {
+{
     private Dictionary<Guid, bool> _collapseFeed;
     private List<Feed> _feeds;
 
     protected override void OnInitialized()
     {
-        List<string> source = ReaderSettings.Sources.Where(k => k.Active).Select(k => k.Link).ToList();
+        List<string> source = FeedReaderSettings.Sources.Where(k => k.Active).Select(k => k.Link).ToList();
         _feeds = FeedService.GetFeeds(source);
         _collapseFeed = new Dictionary<Guid, bool>(_feeds.Select(k => new KeyValuePair<Guid, bool>(k.FeedId, true)));
     }

@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Task2.Data;
 using Task2.Services;
+using Task2.Services.Abstractions;
 
 namespace Task2
 {
@@ -21,8 +22,8 @@ namespace Task2
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<FeedService>();
-            services.AddSingleton<FeedReaderSettings>();
+            services.AddScoped<IFeedService, FeedService>();
+            services.AddScoped<ISettingsService, SettingsService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
