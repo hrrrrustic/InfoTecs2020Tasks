@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using Task2.Data
+@using Task2.Services
 @inject FeedService FeedService
 @inject FeedReaderSettings ReaderSettings
 
@@ -37,7 +38,7 @@
 
     protected override void OnInitialized()
     {
-        List<string> source = ReaderSettings.SourceLinks;
+        List<string> source = ReaderSettings.Sources.Where(k => k.Active).Select(k => k.Link).ToList();
         _feeds = FeedService.GetFeeds(source);
     }
 

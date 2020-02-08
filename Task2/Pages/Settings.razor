@@ -6,69 +6,115 @@
 @inject FeedReaderSettings ReaderSettings
 <h3>Settings</h3>
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-8">
-            <MatAccordion>
-                <MatExpansionPanel @bind-Expanded="@panelOpenState">
-                    <MatExpansionPanelSummary>
-                        <MatExpansionPanelHeader>Rss source links</MatExpansionPanelHeader>
-                    </MatExpansionPanelSummary>
-                    @foreach (string sourceLink in ReaderSettings.SourceLinks)
-                    {
-                        <MatExpansionPanelDetails>
-                            <MatButton OnClick="@(() => ClickRemove(sourceLink))" TrailingIcon="delete">@sourceLink</MatButton>
-                           </MatExpansionPanelDetails>
-                    }
-                </MatExpansionPanel>
-            </MatAccordion>
-        </div>
-        <div class="col-md-4">
-            <MatAccordion>
-                <MatExpansionPanel @bind-Expanded="@panel">
-                    <MatExpansionPanelSummary>
-                        <MatExpansionPanelHeader>Add source link</MatExpansionPanelHeader>
-                    </MatExpansionPanelSummary>
-                    <MatExpansionPanelDetails>
-                        <div class="container">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <MatStringField @bind-Value="@newLink" Label="Link"></MatStringField>
-                                </div>
-                                <div class="col-md-4">
-                                    <MatButton OnClick="@ClickAdd" TrailingIcon="add"></MatButton>
-                                </div>
-                            </div>
-                        </div>
-                    </MatExpansionPanelDetails>
-                </MatExpansionPanel>
-            </MatAccordion>
-        </div>
-    </div>
-</div>
+<MatAccordion>
+    <MatExpansionPanel @bind-Expanded="@_sourceSettings">
+        <MatExpansionPanelSummary>
+            <MatExpansionPanelHeader>Source settings</MatExpansionPanelHeader>
+        </MatExpansionPanelSummary>
+        <MatExpansionPanelDetails>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8">
+                        <MatAccordion>
+                            <MatExpansionPanel @bind-Expanded="@_addedLinksSettings">
+                                <MatExpansionPanelSummary>
+                                    <MatExpansionPanelHeader>Rss source links</MatExpansionPanelHeader>
+                                </MatExpansionPanelSummary>
+                                @foreach (RssSource source in ReaderSettings.Sources)
+                                {
+                                    <MatExpansionPanelDetails>
+                                        <div class="container">
+                                            <div class="row">
+                                                <div class="col-md-8">
+                                                    <p>
+                                                        @source.Link
+                                                    </p>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <MatButton OnClick="@(() => ClickRemove(source.Link))" TrailingIcon="delete"></MatButton>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <MatButton OnClick="@(() => ClickActive(source.Link))" TrailingIcon="@(source.Active ? "check_box" : "check_box_outline_blank")"></MatButton>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </MatExpansionPanelDetails>
+                                }
+                            </MatExpansionPanel>
+                        </MatAccordion>
+                    </div>
+                    <div class="col-md-4">
+                        <MatAccordion>
+                            <MatExpansionPanel @bind-Expanded="@_addLinkSettings">
+                                <MatExpansionPanelSummary>
+                                    <MatExpansionPanelHeader>Add source link</MatExpansionPanelHeader>
+                                </MatExpansionPanelSummary>
+                                <MatExpansionPanelDetails>
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <MatStringField @bind-Value="@_newLink" Label="Link"></MatStringField>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <MatButton OnClick="@ClickAdd" TrailingIcon="add"></MatButton>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </MatExpansionPanelDetails>
+                            </MatExpansionPanel>
+                        </MatAccordion>
+                    </div>
+                </div>
+            </div>
+        </MatExpansionPanelDetails>
+    </MatExpansionPanel>
+    <MatExpansionPanel>
+        <MatExpansionPanelSummary>
+            <MatExpansionPanelHeader>Formatting settings</MatExpansionPanelHeader>
+        </MatExpansionPanelSummary>
+        <MatExpansionPanelDetails>
+            <div>
+                <MatCheckbox @bind-Value="@ReaderSettings.SupportFormatting" Label="@(GetLabel(ReaderSettings.SupportFormatting))"></MatCheckbox>
+            </div>
+        </MatExpansionPanelDetails>
+    </MatExpansionPanel>
+</MatAccordion>
+
+
 
 
     @code
 {
-        string newLink;
-        bool panel;
-        bool panelOpenState;
+        private bool _sourceSettings = false;
+        private bool _addedLinksSettings = false;
+        private bool _addLinkSettings = false;
+        private string _newLink;
+
+        string GetLabel(bool val)
+        {
+            return !val ? "No formatting" : "Formatting";
+        }
 
         public void ClickRemove(string item)
         {
-            ReaderSettings.SourceLinks.Remove(item);
+            ReaderSettings.Sources.Remove(ReaderSettings.Sources.Single(k => k.Link == item));
         }
 
+        public void ClickActive(string item)
+        {
+            int ind = ReaderSettings.Sources.FindIndex(k => k.Link == item);
+            ReaderSettings.Sources[ind] = new RssSource(ReaderSettings.Sources[ind].Link,!ReaderSettings.Sources[ind].Active);
+        }
         public void ClickAdd()
         {
-            if (string.IsNullOrWhiteSpace(newLink))
+            if (string.IsNullOrWhiteSpace(_newLink))
             {
-                newLink = "Nope";
-                return; 
+                _newLink = "Nope";
+                return;
             }
 
-            ReaderSettings.SourceLinks.Add(newLink);
-            newLink = string.Empty;
+            ReaderSettings.Sources.Add(new RssSource(_newLink, true));
+            _newLink = string.Empty;
         }
 
     }
