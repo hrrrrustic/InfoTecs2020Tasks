@@ -3,7 +3,10 @@
 @using MatBlazor
 @using Task2.Data
 @using Microsoft.AspNetCore.Components
+@using Task2.Models
+@using Task2.Services
 @inject FeedReaderSettings ReaderSettings
+@inject FeedService FeedService
 <h3>Settings</h3>
 
 <MatAccordion>
@@ -78,44 +81,62 @@
             </div>
         </MatExpansionPanelDetails>
     </MatExpansionPanel>
+    <MatExpansionPanel>
+        <MatExpansionPanelSummary>
+            <MatExpansionPanelHeader>Auto update settings</MatExpansionPanelHeader>
+        </MatExpansionPanelSummary>
+        <MatExpansionPanelDetails>
+            <div>
+                <MatTextField @bind-Value="@ReaderSettings.RefreshTime" Label="Update time seconds"></MatTextField>
+            </div>
+        </MatExpansionPanelDetails>
+    </MatExpansionPanel>
 </MatAccordion>
 
 
 
 
-    @code
+@code
 {
-        private bool _sourceSettings = false;
-        private bool _addedLinksSettings = false;
-        private bool _addLinkSettings = false;
-        private string _newLink;
+    private bool _sourceSettings = false;
+    private bool _addedLinksSettings = false;
+    private bool _addLinkSettings = false;
+    private string _newLink;
 
-        string GetLabel(bool val)
-        {
-            return !val ? "No formatting" : "Formatting";
-        }
-
-        public void ClickRemove(string item)
-        {
-            ReaderSettings.Sources.Remove(ReaderSettings.Sources.Single(k => k.Link == item));
-        }
-
-        public void ClickActive(string item)
-        {
-            int ind = ReaderSettings.Sources.FindIndex(k => k.Link == item);
-            ReaderSettings.Sources[ind] = new RssSource(ReaderSettings.Sources[ind].Link,!ReaderSettings.Sources[ind].Active);
-        }
-        public void ClickAdd()
-        {
-            if (string.IsNullOrWhiteSpace(_newLink))
-            {
-                _newLink = "Nope";
-                return;
-            }
-
-            ReaderSettings.Sources.Add(new RssSource(_newLink, true));
-            _newLink = string.Empty;
-        }
-
+    string GetLabel(bool val)
+    {
+        return !val ? "No formatting" : "Formatting";
     }
+
+    public void ClickRemove(string item)
+    {
+        ReaderSettings.Sources.Remove(ReaderSettings.Sources.Single(k => k.Link == item));
+    }
+
+    public void ClickActive(string item)
+    {
+        int ind = ReaderSettings.Sources.FindIndex(k => k.Link == item);
+        ReaderSettings.Sources[ind] = new RssSource(ReaderSettings.Sources[ind].Link, !ReaderSettings.Sources[ind].Active);
+    }
+    public void ClickAdd()
+    {
+        if (string.IsNullOrWhiteSpace(_newLink))
+        {
+            _newLink = "Nope";
+            return;
+        }
+
+        bool valid = FeedService.ValidSource(_newLink);
+
+        if (!valid)
+        {
+            _newLink = "Invalid link";
+            return;
+        }
+
+        ReaderSettings.Sources.Add(new RssSource(_newLink, true));
+        _newLink = string.Empty;
+    }
+
+}
 

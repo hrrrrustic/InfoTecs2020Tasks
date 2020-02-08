@@ -5,6 +5,8 @@
         Description,
         PubDate,
         Title,
-        Link
+        Link,
+        Channel,
+        Item
     }
 }

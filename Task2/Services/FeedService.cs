@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using Task2.Data;
+using Task2.Models;
 
 namespace Task2.Services
 {
@@ -40,10 +41,10 @@ namespace Task2.Services
 
         private XmlNode GetChannelNode(XmlElement xmlElement)
         {
-            if (xmlElement.Name == "channel")
+            if (xmlElement.Name == FeedRssProperties.Channel.ToLowerString())
                 return xmlElement;
 
-            XmlNode channelNode = xmlElement.SelectSingleNode("channel");
+            XmlNode channelNode = xmlElement.SelectSingleNode(FeedRssProperties.Channel.ToLowerString());
 
             if (channelNode != null)
                 return channelNode;
@@ -55,7 +56,7 @@ namespace Task2.Services
         {
             List<Feed> feeds = new List<Feed>();
 
-            foreach (XmlNode element in node.SelectNodes("item"))
+            foreach (XmlNode element in node.SelectNodes(FeedRssProperties.Item.ToLowerString()))
             {
                 feeds.Add(GetFeed(element));
             }
@@ -70,6 +71,8 @@ namespace Task2.Services
             foreach (XmlElement element in node)
             {
                 ParseFeed(element, feed);
+                if (feed.IsFilled())
+                    break;
             }
 
             return feed;
@@ -79,7 +82,7 @@ namespace Task2.Services
         {
             if (!Enum.TryParse(element.Name, true, out FeedRssProperties currentProperty))
                 return;
-            
+
             switch (currentProperty)
             {
                 case FeedRssProperties.Title:
