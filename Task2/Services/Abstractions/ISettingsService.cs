@@ -7,5 +7,6 @@ namespace Task2.Services.Abstractions
         RssSource RemoveSource(string source);
         RssSource ChangeSourceActivity(string source);
         RssSource AddNewLink(string source);
+        uint ChangeRefreshTime(uint value);
     }
 }

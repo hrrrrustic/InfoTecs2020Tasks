@@ -1,41 +1,53 @@
 ﻿@page "/"
+@using System.Threading
 @using Task2.Data
 @using Task2.Models
 @using Task2.Services.Abstractions
 @inject IFeedService FeedService
 
-<h1>@Test</h1>
-<div class="container">
-    @foreach (Feed feed in _feeds)
-    {
-        <div class="row">
-            <div class="col-md-12 card">
-                <div class="card-body">
-                    <h2 class="card-title">@feed.Title</h2>
-                    <button type="button" class="btn btn-primary" @onclick="@(k => _collapseFeed[feed.FeedId] = !_collapseFeed[feed.FeedId])">Description @(_collapseFeed[feed.FeedId] ? "+" : "-")</button>
-                    <div class="@(_collapseFeed[feed.FeedId] ? CollapseClass : NoCollapseClass) card-body">
-                        @if (FeedReaderSettings.SupportFormatting)
-                        {
-                            <p>@((MarkupString)feed.Description))</p>
-                        }
-                        else
-                        {
-                            <p>@feed.Description</p>
-                        }
+@if (_feeds == null || _feeds.Count != 0)
+{
+    <div class="container">
+        @foreach (Feed feed in _feeds)
+        {
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <a class="card-link" href="@feed.SourceLink" target="_blank">
+                                <h2 class="card-title">@feed.Title</h2>
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <button type="button" class="btn btn-primary" @onclick="@(k => _collapseFeed[feed.FeedId] = !_collapseFeed[feed.FeedId])">Description @(_collapseFeed[feed.FeedId] ? "+" : "-")</button>
+                            <div class="@(_collapseFeed[feed.FeedId] ? CollapseClass : NoCollapseClass) card-body">
+                                @if (FeedReaderSettings.SupportFormatting)
+                                {
+                                    <p>@((MarkupString)feed.Description))</p>
+                                }
+                                else
+                                {
+                                    <p>@feed.Description</p>
+                                }
+                            </div>
+                        </div>
+                        <div class="card-footer text-right">
+                            <p>@feed.PublicationTime</p>
+                        </div>
                     </div>
-                    <p>Publication Date : @feed.PublicationTime</p>
-                    <a class="btn btn-secondary" href="@feed.SourceLink" target="_blank">View details</a>
                 </div>
             </div>
-        </div>
-    }
-</div>
+        }
+    </div>
+}
+else
+{
+    <h3>There are no feeds, but you can add sources in settings!</h3>
+}
 
 
 @code
 {
-    private string Test = "Test";
-    private int a = 0;
     private const string CollapseClass = "collapse";
     private const string NoCollapseClass = "";
 
@@ -48,21 +60,17 @@
         _feeds = FeedService.GetFeeds(source);
         _collapseFeed = new Dictionary<Guid, bool>(_feeds.Select(k => new KeyValuePair<Guid, bool>(k.FeedId, true)));
 
-        var startTimeSpan = TimeSpan.Zero;
-        var periodTimeSpan = TimeSpan.FromSeconds(FeedReaderSettings.RefreshTime);
+        TimeSpan startTimeSpan = TimeSpan.FromSeconds(FeedReaderSettings.RefreshTime);
+        TimeSpan periodTimeSpan = TimeSpan.FromSeconds(FeedReaderSettings.RefreshTime);
 
-        var timer = new System.Threading.Timer(async e =>
+        Timer timer = new Timer(async e =>
         {
-            _feeds = FeedService.GetFeeds(FeedReaderSettings.Sources.Where(k => k.Active).Select(k => k.Link));
+            _feeds = FeedService.GetFeeds(FeedReaderSettings.Sources.Where(k => k.Active).Select(k => k.Link).ToList());
             _collapseFeed = new Dictionary<Guid, bool>(_feeds.Select(k => new KeyValuePair<Guid, bool>(k.FeedId, true)));
-            Test = $"Updated {a}";
-            a++;
 
-            await InvokeAsync(() =>
-            {
-                base.StateHasChanged();
-            });
+            await InvokeAsync(StateHasChanged);
 
         }, null, startTimeSpan, periodTimeSpan);
+
     }
 }

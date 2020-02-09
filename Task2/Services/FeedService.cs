@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
+using Microsoft.VisualBasic.CompilerServices;
 using Task2.Data;
 using Task2.Models;
 using Task2.Services.Abstractions;
@@ -12,9 +13,15 @@ namespace Task2.Services
     {
         public List<Feed> GetFeeds(IEnumerable<string> sources)
         {
-            return sources.Where(ValidSource).Select(GetFeeds).SelectMany(k => k).ToList();
+            try
+            {
+                return sources.Where(ValidSource).Select(GetFeeds).SelectMany(k => k).ToList();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
-
         public bool ValidSource(string source)
         {
             try
@@ -50,15 +57,23 @@ namespace Task2.Services
             if (channelNode != null)
                 return channelNode;
 
-            throw new Exception();
+            throw new NotSupportedException();
         }
 
         private List<Feed> GetFeeds(XmlNode node)
         {
             var feeds = new List<Feed>();
 
-            foreach (XmlNode element in node.SelectNodes(FeedRssProperties.Item.ToLowerString()))
-                feeds.Add(GetFeed(element));
+            XmlNodeList itemNodes = node.SelectNodes(FeedRssProperties.Item.ToLowerString());
+
+            if (itemNodes.Count == 0)
+                throw new NotSupportedException();
+
+            foreach (XmlNode itemNode in itemNodes)
+            {
+                feeds.Add(GetFeed(itemNode));
+
+            }
 
             return feeds;
         }

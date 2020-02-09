@@ -55,5 +55,16 @@ namespace Task2.Services
 
             return newSource;
         }
+
+        public uint ChangeRefreshTime(uint value)
+        {
+            const int minRefreshTime = 60;
+
+            if (value < minRefreshTime)
+                return minRefreshTime;
+
+            FeedReaderSettings.RefreshTime = value;
+            return value;
+        }
     }
 }

@@ -84,7 +84,7 @@
         </MatExpansionPanelSummary>
         <MatExpansionPanelDetails>
             <div>
-                <MatTextField @bind-Value="@FeedReaderSettings.RefreshTime" Label="Update time seconds"></MatTextField>
+                <MatTextField @bind-Value="@_refreshTime" OnFocusOut="ChangeRefreshTime" Label="Update time seconds"></MatTextField>
             </div>
         </MatExpansionPanelDetails>
     </MatExpansionPanel>
@@ -92,6 +92,7 @@
 
 @code
 {
+
     private const string WithFormatting = "Formatting";
     private const string WithoutFormatting = "No formatting";
 
@@ -104,6 +105,7 @@
     private bool _addLinkSettings = false;
     private string _newLink;
     private string _newLinkLabel = "Link";
+    private uint _refreshTime = 60;
 
     private void ClickRemove(string item)
     {
@@ -125,8 +127,14 @@
             return;
         }
 
-        _newLinkLabel = "Ok";
+        _newLink = "Ok";
+
         _newLink = string.Empty;
+    }
+
+    private void ChangeRefreshTime()
+    {
+        _refreshTime = SettingsService.ChangeRefreshTime(_refreshTime);
     }
 
 }

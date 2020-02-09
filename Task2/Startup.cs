@@ -66,7 +66,7 @@ namespace Task2
 
         private void InitAppSettings()
         {
-            int refreshTime = Configuration.GetValue(nameof(FeedReaderSettings.RefreshTime), 60);
+            uint refreshTime = Configuration.GetValue(nameof(FeedReaderSettings.RefreshTime), (uint)60);
             FeedReaderSettings.RefreshTime = refreshTime < 60 ? 60 : refreshTime;
 
             FeedReaderSettings.SupportFormatting = Configuration.GetValue(nameof(FeedReaderSettings.SupportFormatting), true);

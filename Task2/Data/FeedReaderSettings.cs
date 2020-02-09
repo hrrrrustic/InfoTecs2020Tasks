@@ -5,7 +5,7 @@ namespace Task2.Data
 {
     public static class FeedReaderSettings
     {
-        public static int RefreshTime { get; set; }
+        public static uint RefreshTime { get; set; }
 
         public static List<RssSource> Sources { get; set; }
 
