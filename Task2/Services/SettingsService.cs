@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Task2.Data;
 using Task2.Models;
 using Task2.Services.Abstractions;
@@ -14,16 +15,30 @@ namespace Task2.Services
             _feedService = feedService;
         }
 
-        public void RemoveSource(string source)
+        public RssSource RemoveSource(string source)
         {
             int index = FeedReaderSettings.Sources.FindIndex(k => k.Link == source);
-            FeedReaderSettings.Sources.RemoveAt(index);
+
+            if (index == -1)
+                return null;
+
+            RssSource currentSource = FeedReaderSettings.Sources[index];
+            FeedReaderSettings.Sources.Remove(currentSource);
+
+            return currentSource;
         }
 
-        public void ChangeSourceActivity(string source)
+        public RssSource ChangeSourceActivity(string source)
         {
-            int ind = FeedReaderSettings.Sources.FindIndex(k => k.Link == source);
-            FeedReaderSettings.Sources[ind].Active = !FeedReaderSettings.Sources[ind].Active;
+            int index = FeedReaderSettings.Sources.FindIndex(k => k.Link == source);
+
+            if(index == -1)
+                return null;
+
+            RssSource currentSource = FeedReaderSettings.Sources[index];
+            currentSource.Active = !currentSource.Active;
+
+            return currentSource;
         }
 
         public RssSource AddNewLink(string source)
