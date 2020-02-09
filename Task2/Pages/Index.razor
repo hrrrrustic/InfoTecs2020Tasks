@@ -4,6 +4,7 @@
 @using Task2.Services.Abstractions
 @inject IFeedService FeedService
 
+<h1>@Test</h1>
 <div class="container">
     @foreach (Feed feed in _feeds)
     {
@@ -33,6 +34,8 @@
 
 @code
 {
+    private string Test = "Test";
+    private int a = 0;
     private const string CollapseClass = "collapse";
     private const string NoCollapseClass = "";
 
@@ -44,6 +47,22 @@
         var source = FeedReaderSettings.Sources.Where(k => k.Active).Select(k => k.Link).ToList();
         _feeds = FeedService.GetFeeds(source);
         _collapseFeed = new Dictionary<Guid, bool>(_feeds.Select(k => new KeyValuePair<Guid, bool>(k.FeedId, true)));
-    }
 
+        var startTimeSpan = TimeSpan.Zero;
+        var periodTimeSpan = TimeSpan.FromSeconds(FeedReaderSettings.RefreshTime);
+
+        var timer = new System.Threading.Timer(async e =>
+        {
+            _feeds = FeedService.GetFeeds(FeedReaderSettings.Sources.Where(k => k.Active).Select(k => k.Link));
+            _collapseFeed = new Dictionary<Guid, bool>(_feeds.Select(k => new KeyValuePair<Guid, bool>(k.FeedId, true)));
+            Test = $"Updated {a}";
+            a++;
+
+            await InvokeAsync(() =>
+            {
+                base.StateHasChanged();
+            });
+
+        }, null, startTimeSpan, periodTimeSpan);
+    }
 }

@@ -17,20 +17,16 @@ namespace Task2
         public Startup(IConfiguration configuration)
         {
             ConfigurationBuilder builder = new ConfigurationBuilder();
-            try
-            {
-                builder.AddXmlFile("appsettings.xml");
+            builder.AddXmlFile("appsettings.xml");
 
-            }
-            catch (Exception)
-            {
-                // ignored
-            }
-            finally
+            try
             {
                 Configuration = builder.Build();
             }
-
+            catch (Exception)
+            {
+                Configuration = configuration;
+            }
         }
 
         public IConfiguration Configuration { get; }
