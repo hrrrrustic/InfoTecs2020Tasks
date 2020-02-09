@@ -47,18 +47,5 @@ namespace Task1
             get => ThrewException != null ? throw ThrewException : _value;
             private set => _value = value;
         }
-
-        public static Result<T> WrapSafeResult(Func<T> func)
-        {
-            try
-            {
-                T result = func.Invoke();
-                return new Result<T>(result);
-            }
-            catch(Exception ex)
-            {
-                return new Result<T>(ex);
-            }
-        }
     }
 }

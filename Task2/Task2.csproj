@@ -8,4 +8,10 @@
     <PackageReference Include="MatBlazor" Version="2.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsettings.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -5,7 +5,7 @@
 @using Task2.Services.Abstractions
 @inject IFeedService FeedService
 
-@if (_feeds == null || _feeds.Count != 0)
+@if (_feeds != null && _feeds.Count != 0)
 {
     <div class="container">
         @foreach (Feed feed in _feeds)
@@ -42,7 +42,7 @@
 }
 else
 {
-    <h3>There are no feeds, but you can add sources in settings!</h3>
+    <h3>There are an error in current sources or no sources, but you can add sources in settings!</h3>
 }
 
 
@@ -56,9 +56,12 @@ else
 
     protected override void OnInitialized()
     {
-        var source = FeedReaderSettings.Sources.Where(k => k.Active).Select(k => k.Link).ToList();
+        List<string> source = FeedReaderSettings.Sources.Where(k => k.Active).Select(k => k.Link).ToList();
+
         _feeds = FeedService.GetFeeds(source);
-        _collapseFeed = new Dictionary<Guid, bool>(_feeds.Select(k => new KeyValuePair<Guid, bool>(k.FeedId, true)));
+
+        if (_feeds != null)
+            _collapseFeed = new Dictionary<Guid, bool>(_feeds.Select(k => new KeyValuePair<Guid, bool>(k.FeedId, true)));
 
         TimeSpan startTimeSpan = TimeSpan.FromSeconds(FeedReaderSettings.RefreshTime);
         TimeSpan periodTimeSpan = TimeSpan.FromSeconds(FeedReaderSettings.RefreshTime);
@@ -66,7 +69,9 @@ else
         Timer timer = new Timer(async e =>
         {
             _feeds = FeedService.GetFeeds(FeedReaderSettings.Sources.Where(k => k.Active).Select(k => k.Link).ToList());
-            _collapseFeed = new Dictionary<Guid, bool>(_feeds.Select(k => new KeyValuePair<Guid, bool>(k.FeedId, true)));
+
+            if(_feeds != null)
+                _collapseFeed = new Dictionary<Guid, bool>(_feeds.Select(k => new KeyValuePair<Guid, bool>(k.FeedId, true)));
 
             await InvokeAsync(StateHasChanged);
 

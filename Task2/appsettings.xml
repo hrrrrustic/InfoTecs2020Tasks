@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Settings>
+  <RefreshTime>1</RefreshTime>
+  <Sources>
+    <Source>
+      <Active>true</Active>
+      <Link>https://habr.com/ru/rss/all/all/</Link>
+    </Source>
+  </Sources>
+  <SupportFormatting>false</SupportFormatting>
+</Settings>
